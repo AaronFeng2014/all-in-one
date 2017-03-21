@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+    
+    
+    <bean name="hessian" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+        <property name="serviceUrl" value="http://localtest.fangcang.com:8080/hessian"/>
+        <property name="serviceInterface" value="com.aaron.framework.hessian.HessianInterface"/>
+    </bean>
+
+</beans>
