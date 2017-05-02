@@ -1,5 +1,6 @@
 package com.aaron.util.file;
 
+import com.aaron.util.StringUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -257,5 +258,34 @@ public final class FileUtils
             }
         }
 
+
+        /**
+         * 根据指定的文件名获取文件的扩展名
+         *
+         * @param fileName String：文件全路径
+         * @return String：文件的扩展名
+         */
+        public static String getFileExtension(String fileName)
+        {
+            if (StringUtil.isEmpty(fileName))
+            {
+                throw new RuntimeException("文件名错误");
+            }
+
+            File file = new File(fileName);
+
+            if (!file.isFile())
+            {
+                throw new RuntimeException("不是一个文件");
+            }
+
+            String name = file.getName();
+            if (name.lastIndexOf(".") != -1)
+            {
+                return name.substring(name.lastIndexOf(".") + 1);
+            }
+
+            return "";
+        }
     }
 }

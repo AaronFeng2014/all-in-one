@@ -173,13 +173,7 @@ public final class HttpUtil
     {
         try
         {
-            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy()
-            {
-                public boolean isTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException
-                {
-                    return true;
-                }
-            }).build();
+            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (x509Certificates, s) -> true).build();
 
             return new SSLConnectionSocketFactory(sslContext);
         }
