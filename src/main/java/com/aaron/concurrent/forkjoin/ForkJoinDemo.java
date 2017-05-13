@@ -15,10 +15,9 @@ public class ForkJoinDemo
     {
         long start = System.currentTimeMillis();
 
-        ForkJoinPool pool = new ForkJoinPool();
+        ForkJoinPool pool = new ForkJoinPool(50);
 
         ForkJoinTask<Long> result = pool.submit(new CalculateSumTask(1, 10000));
-
         System.out.println("结果是：" + result.get());
 
         System.out.println("计算耗时：" + (System.currentTimeMillis() - start));

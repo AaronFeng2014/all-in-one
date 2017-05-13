@@ -42,6 +42,7 @@ public class CalculateSumTask extends RecursiveTask<Long>
 
             sum = leftFork.join() + rightFork.join();
         }
+        System.out.println("线程" + Thread.currentThread().getName() + "计算的结果是：" + sum);
         return sum;
     }
 
