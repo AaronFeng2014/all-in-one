@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -14,6 +15,7 @@ import java.util.Date;
 public final class DateUtils
 {
     private static final Log LOG_RECORD = LogFactory.getLog(DateUtils.class);
+
     private static final String DEFAULT_FORMATTER = "yyyy-MM-dd HH:mm:ss";
 
 
@@ -31,7 +33,7 @@ public final class DateUtils
      */
     public static String dateToString(Date date)
     {
-        SimpleDateFormat format = null;
+        SimpleDateFormat format;
         String dateString = null;
         try
         {
@@ -116,6 +118,24 @@ public final class DateUtils
             LOG_RECORD.error("string convert date error,", e);
         }
         return date;
+    }
+
+
+    /**
+     * 获取基于当前日期的一个相对日期
+     *
+     * @param interval
+     * @param amount
+     * @return
+     */
+    public static Date getDateBeforeCurrent(int interval, int amount)
+    {
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.add(interval, amount);
+
+        return calendar.getTime();
     }
 
 }

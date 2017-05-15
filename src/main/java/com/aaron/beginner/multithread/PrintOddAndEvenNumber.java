@@ -12,6 +12,8 @@ public class PrintOddAndEvenNumber
 {
     private int number;
 
+    private final static Object OBJECT_LOCK = new Object();
+
 
     public static void main(String[] args)
     {
@@ -21,14 +23,14 @@ public class PrintOddAndEvenNumber
         {
             while (true)
             {
-                synchronized (printNumber)
+                synchronized (OBJECT_LOCK)
                 {
                     if (printNumber.number % 2 == 0)
                     {
                         //唤醒其他线程
                         try
                         {
-                            printNumber.wait();
+                            OBJECT_LOCK.wait();
                         }
                         catch (InterruptedException e)
                         {
@@ -47,7 +49,7 @@ public class PrintOddAndEvenNumber
                         {
                             e.printStackTrace();
                         }
-                        printNumber.notify();
+                        OBJECT_LOCK.notify();
                     }
 
                 }
@@ -59,7 +61,7 @@ public class PrintOddAndEvenNumber
 
             while (true)
             {
-                synchronized (printNumber)
+                synchronized (OBJECT_LOCK)
                 {
                     if (printNumber.number % 2 == 0)
                     {
@@ -75,13 +77,13 @@ public class PrintOddAndEvenNumber
                             e.printStackTrace();
                         }
 
-                        printNumber.notify();
+                        OBJECT_LOCK.notify();
                     }
                     else
                     {
                         try
                         {
-                            printNumber.wait();
+                            OBJECT_LOCK.wait();
                         }
                         catch (InterruptedException e)
                         {
