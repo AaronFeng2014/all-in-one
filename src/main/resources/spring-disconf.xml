@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <context:component-scan base-package="com.aaron.component.disconf"/>
+
+    <bean id="disconfManager" class="com.baidu.disconf.client.DisconfMgrBean" destroy-method="destroy">
+        <property name="scanPackage" value="com.aaron.component.disconf"/>
+    </bean>
+
+    <bean id="disconfManager2" class="com.baidu.disconf.client.DisconfMgrBeanSecond" init-method="init" destroy-method="destroy"/>
+
+    <!-- 自动管理配置文件，该种方式对以前的代码无入侵
+        原理：应用启动时，从配置中心下载配置文件，保存到本地指定路径
+
+        注意：该功能需要在disconf.properties配置文件中开启，默认是关闭的，disconf.enable.remote.conf=true
+    -->
+    <bean id="reload" class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:emailConfig.properties</value>
+                <value>classpath:exception-alert-config.properties</value>
+                <value>classpath:jdbc.properties</value>
+                <value>classpath:dataSource.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--配置中数据发生变化时，不能自动reload，必须自己手动写回调函数，才能达到更新的目的，这是正对比较重的资源-->
+    <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="propertiesArray">
+            <list>
+                <ref bean="reload"/>
+            </list>
+        </property>
+    </bean>-->
+
+
+    <!-- 配置中数据发生变化时，能自动reload-->
+    <bean class="com.baidu.disconf.client.addons.properties.ReloadingPropertyPlaceholderConfigurer">
+        <property name="propertiesArray">
+            <list>
+                <ref bean="reload"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="people" class="com.aaron.component.disconf.People">
+        <property name="name" value="${appName}"/>
+        <property name="age" value="${channelCode}"/>
+    </bean>
+</beans>

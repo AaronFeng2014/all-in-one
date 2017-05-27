@@ -64,7 +64,7 @@
     </appender>
 
     <root>
-        <level value="INFO"/>
+        <level value="DEBUG"/>
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="INFO"/>
         <appender-ref ref="DEBUG_LOG"/>
