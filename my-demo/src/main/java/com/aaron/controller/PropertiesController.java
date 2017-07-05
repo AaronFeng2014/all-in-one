@@ -37,6 +37,7 @@ public class PropertiesController implements ApplicationContextAware
 
             LOG.warn(context.getBean("switchVariable"));
             LOG.warn(context.getBean("fileItemDemo"));
+            LOG.warn(context.getBean("people"));
 
             return "{key:" + PropertyUtil.getProperty(key) + "}";
         }

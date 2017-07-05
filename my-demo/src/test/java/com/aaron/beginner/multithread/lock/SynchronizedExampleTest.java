@@ -24,10 +24,7 @@ public class SynchronizedExampleTest
 
         new Thread(test01::testMethodLock02).start();
 
-        while (true)
-        {
 
-        }
     }
 
 
@@ -47,10 +44,7 @@ public class SynchronizedExampleTest
 
         new Thread(test02::testMethodLock02).start();
 
-        while (true)
-        {
 
-        }
     }
 
 
@@ -63,10 +57,6 @@ public class SynchronizedExampleTest
 
         new Thread(test01::testCodeBlockLock02).start();
 
-        while (true)
-        {
-
-        }
     }
 
 
@@ -79,10 +69,7 @@ public class SynchronizedExampleTest
 
         new Thread(test01::testMethodLock01).start();
 
-        while (true)
-        {
 
-        }
     }
 
 
@@ -96,11 +83,6 @@ public class SynchronizedExampleTest
 
         new Thread(test02::testCodeBlockLock02).start();
 
-        while (true)
-        {
-
-        }
-
     }
 
 
@@ -113,10 +95,6 @@ public class SynchronizedExampleTest
 
         new Thread(SynchronizedExample::testClassLock01).start();
 
-        while (true)
-        {
-
-        }
     }
 
 
@@ -128,10 +106,6 @@ public class SynchronizedExampleTest
 
         new Thread(SynchronizedExample::testClassLock02).start();
 
-        while (true)
-        {
-
-        }
     }
 
 }

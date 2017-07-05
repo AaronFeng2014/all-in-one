@@ -288,4 +288,13 @@ public final class FileUtils
             return "";
         }
     }
+
+
+    public static void main(String[] args)
+    {
+        String path = "D:\\Code\\GitHub\\BigData-Scala\\spark-warehouse";
+
+        FileUtils.searchContents("直连专用", path);
+    }
+
 }
