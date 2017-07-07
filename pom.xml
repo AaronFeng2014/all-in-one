@@ -8,6 +8,8 @@
     <modules>
         <module>springcloud</module>
         <module>my-demo</module>
+        <module>springcloud-eureka-server</module>
+        <module>springcloud-eureka-client</module>
     </modules>
     <name>all-in-one</name>
     <url>http://maven.apache.org</url>
@@ -17,6 +19,18 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Dalston.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
