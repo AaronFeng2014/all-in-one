@@ -1,4 +1,4 @@
-package eureka.controller;
+package com.aaron.springcloud.eureka.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -21,7 +21,7 @@ public class ConfigRegistryController
     private DiscoveryClient discoveryClient;
 
 
-    @RequestMapping ("/service-instance/{applicationName}")
+    //@RequestMapping ("/service-instance/{applicationName}")
     public List<ServiceInstance> getServiceInstance(@PathVariable String applicationName)
     {
         return discoveryClient.getInstances(applicationName);
