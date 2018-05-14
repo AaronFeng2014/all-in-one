@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://www.springframework.org/schema/xmly"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.springframework.org/schema/xmly">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+
+
+    <!-- Top-level <beans> tag -->
+    <xsd:element name="service-center">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.beans.factory.config.ConstructorArgumentValues">
+                <![CDATA[
+                这是spring自定义的标签解析程序测试
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+
+
+        <xsd:complexType>
+            <xsd:attribute name="host" type="xsd:string">
+            </xsd:attribute>
+            <xsd:attribute name="port" type="xsd:int">
+            </xsd:attribute>
+        </xsd:complexType>
+
+    </xsd:element>
+
+
+    <xsd:element name="backup-path">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.beans.factory.config.ConstructorArgumentValues">
+                <![CDATA[
+                这是spring自定义的标签解析程序测试
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+
+
+        <xsd:complexType>
+            <xsd:attribute name="file-system" type="xsd:string">
+            </xsd:attribute>
+            <xsd:attribute name="network" type="xsd:string">
+            </xsd:attribute>
+        </xsd:complexType>
+
+    </xsd:element>
+
+
+</xsd:schema>

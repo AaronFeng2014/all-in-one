@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xmly="http://www.springframework.org/schema/xmly"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/xmly http://www.springframework.org/schema/xmly/xmly.xsd">
+
+
+    <xmly:service-center host="test.com.ser" port="8888"/>
+
+
+    <xmly:backup-path file-system="本地硬盘" network="网络"/>
+
+
+
+</beans>
