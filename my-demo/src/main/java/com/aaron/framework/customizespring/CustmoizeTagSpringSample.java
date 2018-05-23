@@ -1,6 +1,8 @@
 package com.aaron.framework.customizespring;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -8,6 +10,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @description 一句话描述该文件的用途
  * @date 2018/5/14
  */
+@Import (ImportBean.class)
+@Configuration
 public class CustmoizeTagSpringSample
 {
 
@@ -15,6 +19,7 @@ public class CustmoizeTagSpringSample
     {
         ApplicationContext context = new ClassPathXmlApplicationContext("customize-spring.xml");
 
+        System.out.println("bean ---->" + context.getBean(ImportBean.class));
         System.out.println(context);
     }
 }
