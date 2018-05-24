@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: spring-cloud-eureka-server
+
+server:
+  port: 8888
+
+eureka:
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 30000
+    remote-region-registry-fetch-interval: 10
+    peer-eureka-status-refresh-time-interval-ms: 10000
+
+
+
+  instance:
+    hostname: eureka-server
+  client:
+    registerWithEureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: "http://localhost:${server.port}/eureka/"
