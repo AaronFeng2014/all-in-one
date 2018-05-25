@@ -17,7 +17,7 @@
 
     <!-- Preserve messages in a local file -->
     <appender name="INFO" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./logs/hotel/Hub/Hub_INFO.log"/>
+        <param name="File" value="./logs/hotel/Hub/info.log"/>
         <param name="Append" value="true"/>
         <param name="MaxFileSize" value="20MB"/>
         <param name="Threshold" value="INFO"/>
@@ -32,9 +32,9 @@
     </appender>
 
     <!-- Append messages to the error log file -->
-    <appender name="ERROR_LOG" class="org.apache.log4j.RollingFileAppender">
+    <appender name="ERROR" class="org.apache.log4j.RollingFileAppender">
         <param name="Threshold" value="ERROR"/>
-        <param name="File" value="./logs/hotel/Hub/Hub_ERROR.log"/>
+        <param name="File" value="./logs/hotel/Hub/error.log"/>
         <param name="Append" value="true"/>
         <param name="MaxFileSize" value="20MB"/>
         <param name="MaxBackupIndex" value="5"/>
@@ -48,9 +48,25 @@
     </appender>
 
     <!-- Append messages to the debug log file -->
-    <appender name="DEBUG_LOG" class="org.apache.log4j.RollingFileAppender">
+    <appender name="DEBUG" class="org.apache.log4j.RollingFileAppender">
         <param name="Threshold" value="DEBUG"/>
-        <param name="File" value="./logs/hotel/Hub/Hub_DEBUG.log"/>
+        <param name="File" value="./logs/hotel/Hub/debug.log"/>
+        <param name="Append" value="true"/>
+        <param name="MaxFileSize" value="20MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
+        </layout>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="DEBUG"/>
+            <param name="LevelMax" value="DEBUG"/>
+        </filter>
+    </appender>
+
+    <!-- Append messages to the debug log file -->
+    <appender name="WARNING" class="org.apache.log4j.RollingFileAppender">
+        <param name="Threshold" value="DEBUG"/>
+        <param name="File" value="./logs/hotel/Hub/debug.log"/>
         <param name="Append" value="true"/>
         <param name="MaxFileSize" value="20MB"/>
         <param name="MaxBackupIndex" value="5"/>
@@ -67,8 +83,9 @@
         <level value="DEBUG"/>
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="INFO"/>
-        <appender-ref ref="DEBUG_LOG"/>
-        <appender-ref ref="ERROR_LOG"/>
+        <appender-ref ref="DEBUG"/>
+        <appender-ref ref="ERROR"/>
+        <appender-ref ref="WARNING"/>
     </root>
 
 </log4j:configuration>
