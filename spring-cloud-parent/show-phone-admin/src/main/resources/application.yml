@@ -1,9 +1,16 @@
 spring:
   application:
-    name: spring-cloud-service-consumer
+    name: "phone-show-admin"
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+      enabled: true
 
 server:
-  port: 7775
+  port: 7774
+  servlet:
+    context-path: "/admin"
 
 eureka:
   client:
@@ -16,3 +23,7 @@ eureka:
     lease-expiration-duration-in-seconds: 30
     lease-renewal-interval-in-seconds: 10
     prefer-ip-address: true
+mybatis:
+  config-location: "classpath:mybatis-config.xml"
+
+

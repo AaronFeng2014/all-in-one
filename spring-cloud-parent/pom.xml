@@ -20,6 +20,9 @@
         <module>spring-cloud-service-provider-api</module>
         <module>spring-cloud-service-provider</module>
         <module>spring-cloud-service-consumer</module>
+        <module>spring-cloud-gateway</module>
+        <module>show-phone-admin</module>
+        <module>show-phone-bean</module>
     </modules>
     <url>http://maven.apache.org</url>
 

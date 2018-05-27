@@ -21,10 +21,10 @@ import org.springframework.context.annotation.PropertySource;
 @ComponentScan (basePackages = {"com.aaron.springcloud.consumer"})
 @EnableFeignClients (basePackages = {"com.aaron"})
 @MapperScan ("com.aaron.springcloud.consumer.dao")
-public class SpringCloudServiceConsumerApplication
+public class PhoneShowAdminApplication
 {
     public static void main(String[] args)
     {
-        SpringApplication.run(SpringCloudServiceConsumerApplication.class, args);
+        SpringApplication.run(PhoneShowAdminApplication.class, args);
     }
 }

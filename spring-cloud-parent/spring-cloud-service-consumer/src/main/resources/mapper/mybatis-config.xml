@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaron.springcloud.consumer.dao.ProductMapper">
+
+    <select id="queryPhoneInfo" resultType="com.aaron.springcloud.entity.po.PhoneInfo">
+        select
+          a.id,
+          a.name,
+          a.brand,
+          a.description,
+          a.createTime
+        from phone.phone a
+    </select>
+
+    <select id="queryPhoneInfoById" resultType="com.aaron.springcloud.entity.po.PhoneInfo">
+        select
+          a.id,
+          a.name,
+          a.brand,
+          a.description,
+          a.createTime
+        from phone.phone a
+        where a.id = #{id}
+    </select>
+</mapper>
