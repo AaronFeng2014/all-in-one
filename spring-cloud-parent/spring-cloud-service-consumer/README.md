@@ -6,3 +6,4 @@
 
 ## 接口文档管理
 * 使用[swagger 2](https://swagger.io/)进行文档管理， 方便测试和联调
+* 接口地址：host:port/contextPath/swagger-ui.html

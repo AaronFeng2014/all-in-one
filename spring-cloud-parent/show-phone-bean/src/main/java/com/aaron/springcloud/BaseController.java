@@ -1,6 +1,8 @@
 package com.aaron.springcloud;
 
 import com.aaron.springcloud.exception.CustomizeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,10 +15,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class BaseController
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
+
+
     @ExceptionHandler (Exception.class)
     public ResponseEntity<String> exceptionHandler(Exception e)
     {
 
+        LOGGER.error("捕获到全局异常信息", e);
         String message = e.getMessage();
         if (e instanceof CustomizeException)
         {
