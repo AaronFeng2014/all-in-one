@@ -1,6 +1,7 @@
 package com.aaron.springcloud.consumer.controller;
 
 import com.aaron.springcloud.BaseController;
+import com.aaron.springcloud.consumer.NeedAuth;
 import com.aaron.springcloud.consumer.service.PhoneService;
 import com.aaron.springcloud.entity.vo.PhoneInfoVo;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class PhoneController extends BaseController
     private PhoneService phoneService;
 
 
+    @NeedAuth
     @RequestMapping (value = "product", method = RequestMethod.PUT)
     public ResponseEntity<String> addPhoneInfo(@RequestBody PhoneInfoVo phoneInfoVo)
     {

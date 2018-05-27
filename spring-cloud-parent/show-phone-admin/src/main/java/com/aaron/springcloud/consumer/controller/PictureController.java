@@ -1,6 +1,7 @@
 package com.aaron.springcloud.consumer.controller;
 
 import com.aaron.springcloud.BaseController;
+import com.aaron.springcloud.consumer.NeedAuth;
 import com.aaron.springcloud.consumer.utils.UUIDUtil;
 import com.aaron.springcloud.entity.vo.PictureVo;
 import io.swagger.annotations.Api;
@@ -39,6 +40,7 @@ public class PictureController extends BaseController
     private static final String FILE_DIRECTORY = "/Users/fenghaixin/Desktop/";
 
 
+    @NeedAuth
     @ApiOperation (value = "手机图片上传", notes = "根据指定的手机id上传和该手机id关联的图片")
     @ApiImplicitParam (name = "phoneId", value = "上传的图片所属的手机id", required = true, dataType = "long", paramType = "path")
     @RequestMapping (value = "picture/{phoneId}", method = RequestMethod.PUT, consumes = "multipart/*")
