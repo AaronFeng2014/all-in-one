@@ -1,6 +1,7 @@
 package com.aaron.springcloud.consumer.dao;
 
 import com.aaron.springcloud.entity.po.PhoneInfo;
+import com.aaron.springcloud.entity.po.Picture;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -31,4 +32,8 @@ public interface ProductMapper
      * @return PhoneInfo：手机信息
      */
     PhoneInfo queryPhoneInfoById(@Param ("id") Long id);
+
+
+    List<Picture> queryPhonePicture(@Param ("phoneIdList") List<Long> phoneIdList);
+
 }

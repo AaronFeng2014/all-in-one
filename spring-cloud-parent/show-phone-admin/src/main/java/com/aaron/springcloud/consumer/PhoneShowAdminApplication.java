@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * @author FengHaixin
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 @ComponentScan (basePackages = {"com.aaron.springcloud.consumer"})
 @EnableFeignClients (basePackages = {"com.aaron"})
 @MapperScan ("com.aaron.springcloud.consumer.dao")
+@EnableSwagger2
 public class PhoneShowAdminApplication
 {
     public static void main(String[] args)

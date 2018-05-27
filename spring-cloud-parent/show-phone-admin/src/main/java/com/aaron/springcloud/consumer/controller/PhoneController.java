@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2018/5/26
  */
 @RestController
-public class PhoneController
+public class PhoneController extends BaseController
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PhoneController.class);

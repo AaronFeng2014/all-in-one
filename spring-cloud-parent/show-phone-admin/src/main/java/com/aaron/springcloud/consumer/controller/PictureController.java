@@ -2,6 +2,10 @@ package com.aaron.springcloud.consumer.controller;
 
 import com.aaron.springcloud.consumer.utils.UUIDUtil;
 import com.aaron.springcloud.entity.vo.PictureVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
@@ -25,7 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2018/5/27
  */
 @RestController
-public class PictureController
+@Api (value = "图片", description = "手机图片管理接口")
+public class PictureController extends BaseController
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PictureController.class);
@@ -33,11 +38,14 @@ public class PictureController
     private static final String FILE_DIRECTORY = "/Users/fenghaixin/Desktop/";
 
 
-    @RequestMapping (value = "picture/{phoneId}", method = RequestMethod.POST)
-    public ResponseEntity uploadPicture(@RequestParam ("file") MultipartFile file, @PathVariable ("phoneId") Long phoneId)
+    @ApiOperation (value = "手机图片上传", notes = "根据指定的手机id上传和该手机id关联的图片")
+    @ApiImplicitParam (name = "phoneId", value = "上传的图片所属的手机id", required = true, dataType = "long", paramType = "path")
+    @RequestMapping (value = "picture/{phoneId}", method = RequestMethod.PUT, consumes = "multipart/*")
+    public ResponseEntity uploadPicture(@ApiParam (value = "选择上传的图片", required = true) @RequestParam ("picFile") MultipartFile picFile,
+                                        @PathVariable ("phoneId") Long phoneId)
     {
 
-        String originalFilename = file.getOriginalFilename();
+        String originalFilename = picFile.getOriginalFilename();
 
         String newName = UUIDUtil.getUuid() + "." + FilenameUtils.getExtension(originalFilename);
         LOGGER.info("上传的文件名：{}", originalFilename);
@@ -50,7 +58,7 @@ public class PictureController
         try
         {
             //写到本地，这里也可以使用fdfs来处理图片信息
-            FileUtils.writeByteArrayToFile(new File(FILE_DIRECTORY + newName), file.getBytes());
+            FileUtils.writeByteArrayToFile(new File(FILE_DIRECTORY + newName), picFile.getBytes());
         }
         catch (IOException e)
         {

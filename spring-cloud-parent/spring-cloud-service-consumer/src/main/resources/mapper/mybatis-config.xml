@@ -4,6 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aaron.springcloud.consumer.dao.ProductMapper">
 
+    <resultMap id="phoneResultMap" type="com.aaron.springcloud.entity.po.PhoneInfo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="brand" column="brand"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="createTime"/>
+
+        <collection property="pictureList" column="id" ofType="com.aaron.springcloud.entity.po.Picture">
+            <id property="id" column="picId"/>
+            <id property="phoneId" column="id"/>
+            <result property="name" column="picName"/>
+            <result property="url" column="picUrl"/>
+        </collection>
+    </resultMap>
+
     <select id="queryPhoneInfo" resultType="com.aaron.springcloud.entity.po.PhoneInfo">
         select
           a.id,
@@ -23,5 +38,19 @@
           a.createTime
         from phone.phone a
         where a.id = #{id}
+    </select>
+
+
+    <select id="queryPhonePicture" parameterType="java.util.List" resultType="com.aaron.springcloud.entity.po.Picture">
+        select
+        a.id,
+        a.phoneId,
+        a.name,
+        a.url
+        from phone.pictures a
+        where a.phoneId in
+        <foreach collection="phoneIdList" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

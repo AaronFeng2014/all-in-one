@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,11 +35,11 @@ public class PhoneController
     private PhoneService phoneService;
 
 
-    @RequestMapping (value = "products")
-    public List<PhoneInfo> queryPhoneInfoList(@RequestBody String name)
+    @RequestMapping (value = "product", method = RequestMethod.GET)
+    public List<PhoneInfo> queryPhoneInfoList(@RequestParam ("page") int page, @RequestParam ("pageSize") int pageSize)
     {
 
-        List<PhoneInfo> phoneInfoList = phoneService.queryPhoneInfoList();
+        List<PhoneInfo> phoneInfoList = phoneService.queryPhoneInfoList(page, pageSize);
 
         LOGGER.info("数据库查询手机信息：{}", phoneInfoList);
         return phoneInfoList;

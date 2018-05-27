@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface PhoneService
 {
-    List<PhoneInfo> queryPhoneInfoList();
+    List<PhoneInfo> queryPhoneInfoList(int page, int pageSize);
 
 
     PhoneInfo queryPhoneInfoById(Long phoneId);

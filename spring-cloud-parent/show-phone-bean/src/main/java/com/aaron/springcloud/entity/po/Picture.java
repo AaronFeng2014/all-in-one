@@ -16,6 +16,8 @@ import lombok.ToString;
 @ToString
 public class Picture
 {
+    private Long id;
+
     private Long phoneId;
 
     private String name;

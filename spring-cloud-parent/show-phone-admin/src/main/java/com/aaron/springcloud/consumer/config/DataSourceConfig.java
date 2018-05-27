@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.Properties;
 
@@ -23,7 +23,9 @@ import java.util.Properties;
  * @date 2018/5/26
  */
 @Configuration
-@PropertySource ("classpath:jdbc.properties")
+//@PropertySource ("classpath:jdbc.properties")
+//@ConfigurationProperties
+@EnableAsync
 public class DataSourceConfig
 {
 

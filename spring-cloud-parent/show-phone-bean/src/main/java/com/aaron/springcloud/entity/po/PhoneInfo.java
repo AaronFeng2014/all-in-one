@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,12 +30,7 @@ public class PhoneInfo
     /**
      * 手机的图片信息
      */
-    private List<Picture> pictureList;
-
-    /**
-     * 手机的用户评论信息
-     */
-    private List<CommentPo> commentList;
+    private List<Picture> pictureList = new ArrayList<>();
 
     private Date createTime;
 }
