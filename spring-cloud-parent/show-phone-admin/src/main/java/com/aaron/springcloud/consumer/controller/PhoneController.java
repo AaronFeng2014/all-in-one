@@ -1,5 +1,6 @@
 package com.aaron.springcloud.consumer.controller;
 
+import com.aaron.springcloud.BaseController;
 import com.aaron.springcloud.consumer.service.PhoneService;
 import com.aaron.springcloud.entity.vo.PhoneInfoVo;
 import org.slf4j.Logger;

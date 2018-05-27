@@ -4,7 +4,9 @@ import com.aaron.springcloud.consumer.dao.ProductMapper;
 import com.aaron.springcloud.consumer.service.PhoneService;
 import com.aaron.springcloud.entity.po.PhoneInfo;
 import com.aaron.springcloud.entity.po.Picture;
+import com.aaron.springcloud.exception.ResourceNotFoundException;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,16 @@ public class PhoneServiceImpl implements PhoneService
     @Override
     public PhoneInfo queryPhoneInfoById(Long phoneId)
     {
-        return productDao.queryPhoneInfoById(phoneId);
+        PhoneInfo phoneInfo = productDao.queryPhoneInfoById(phoneId);
+
+        if (phoneInfo == null)
+        {
+            throw new ResourceNotFoundException("未查询到手机信息");
+        }
+
+        List<Picture> pictures = productDao.queryPhonePicture(ImmutableList.of(phoneId));
+
+        phoneInfo.setPictureList(pictures);
+        return phoneInfo;
     }
 }

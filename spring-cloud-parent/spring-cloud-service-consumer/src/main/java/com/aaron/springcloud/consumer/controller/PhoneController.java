@@ -1,5 +1,6 @@
 package com.aaron.springcloud.consumer.controller;
 
+import com.aaron.springcloud.BaseController;
 import com.aaron.springcloud.consumer.service.PhoneService;
 import com.aaron.springcloud.entity.po.PhoneInfo;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import java.util.List;
  * @date 2018/5/26
  */
 @RestController
-public class PhoneController
+public class PhoneController extends BaseController
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PhoneController.class);

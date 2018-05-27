@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface CommentService
 {
-    List<CommentPo> queryComment(Long phoneId);
+    List<CommentPo> queryComment(Long phoneId, int page);
 
 
     void addComment(CommentVo commentVo);

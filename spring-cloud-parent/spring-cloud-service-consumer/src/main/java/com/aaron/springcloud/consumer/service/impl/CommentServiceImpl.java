@@ -4,10 +4,13 @@ import com.aaron.springcloud.consumer.dao.CommentMapper;
 import com.aaron.springcloud.consumer.service.CommentService;
 import com.aaron.springcloud.entity.po.CommentPo;
 import com.aaron.springcloud.entity.vo.CommentVo;
+import com.aaron.springcloud.exception.ResourceNotFoundException;
+import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -22,14 +25,27 @@ public class CommentServiceImpl implements CommentService
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
 
+    /**
+     * 查询评论的分页大小
+     */
+    private static final int COMMENT_PAGE_SIZE = 2;
+
     @Autowired
     private CommentMapper commentMapper;
 
 
     @Override
-    public List<CommentPo> queryComment(Long phoneId)
+    public List<CommentPo> queryComment(Long phoneId, int page)
     {
-        return commentMapper.queryComment(phoneId);
+        PageHelper.startPage(page, COMMENT_PAGE_SIZE);
+
+        List<CommentPo> commentPoList = commentMapper.queryComment(phoneId);
+
+        if (CollectionUtils.isEmpty(commentPoList))
+        {
+            throw new ResourceNotFoundException("无评论信息");
+        }
+        return commentPoList;
     }
 
 

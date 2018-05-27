@@ -1,5 +1,6 @@
 package com.aaron.springcloud.consumer.controller;
 
+import com.aaron.springcloud.BaseController;
 import com.aaron.springcloud.consumer.utils.UUIDUtil;
 import com.aaron.springcloud.entity.vo.PictureVo;
 import io.swagger.annotations.Api;
