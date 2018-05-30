@@ -1,9 +1,11 @@
-package com.aaron.framework.customizespring;
+package com.aaron.framework.customizespring.beanpostprocessor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+
+import java.util.function.Function;
 
 /**
  * @author FengHaixin
@@ -23,6 +25,11 @@ public class CustmoizeBeanPostProcessor implements BeanPostProcessor
         if (annotation != null)
         {
             System.out.println(bean + " 是一个控制器");
+        }
+
+        if (bean instanceof Function)
+        {
+            ((Function<String, Integer>)bean).apply("23");
         }
 
         return bean;

@@ -8,6 +8,8 @@
 
     <context:component-scan base-package="com.aaron.framework.customizespring"/>
 
+    <context:property-placeholder location="jdbc.properties"/>
+
     <xmly:service-center host="test.com.ser" port="8888"/>
 
 

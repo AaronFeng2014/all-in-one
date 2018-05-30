@@ -1,5 +1,6 @@
 package com.aaron.framework.customizespring;
 
+import com.aaron.framework.customizespring.registry.BeanRegistryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -20,6 +21,9 @@ public class CustmoizeTagSpringSample
         ApplicationContext context = new ClassPathXmlApplicationContext("customize-spring.xml");
 
         System.out.println("bean ---->" + context.getBean(ImportBean.class));
+        BeanRegistryBean bean = context.getBean(BeanRegistryBean.class);
+
+        System.out.println(bean);
         System.out.println(context);
     }
 }
