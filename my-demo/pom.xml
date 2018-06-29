@@ -1,8 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    <groupId>com.aaron</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>my-demo</artifactId>
+    <version>1.0.0</version>
     <packaging>war</packaging>
     <name>my-demo</name>
     <url>http://maven.apache.org</url>
@@ -224,6 +226,14 @@
             <artifactId>netty-transport</artifactId>
             <version>4.0.27.Final</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava -->
+        <dependency>
+            <groupId>io.reactivex.rxjava2</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>2.1.15</version>
+        </dependency>
+
 
     </dependencies>
 
