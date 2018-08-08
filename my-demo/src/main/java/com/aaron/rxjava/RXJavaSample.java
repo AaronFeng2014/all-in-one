@@ -103,7 +103,7 @@ public class RXJavaSample
     @Test
     public void interval() throws InterruptedException
     {
-        Flowable.<String>interval(1, TimeUnit.SECONDS).subscribe(aLong -> System.out.println(aLong + 10));
+        Flowable.interval(1, TimeUnit.SECONDS).subscribe(aLong -> System.out.println(aLong + 10));
 
         TimeUnit.SECONDS.sleep(10);
     }
