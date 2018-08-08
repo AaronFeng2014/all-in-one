@@ -3,9 +3,16 @@
  */
 package com.aaron.designpattern.observe.impl2;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * @author Aaron
  */
+@Setter
+@Getter
+@ToString
 public class Students extends Subjects implements Observer
 {
 

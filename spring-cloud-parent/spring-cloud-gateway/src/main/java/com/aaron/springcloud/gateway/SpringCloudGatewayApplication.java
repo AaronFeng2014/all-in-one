@@ -42,7 +42,12 @@ public class SpringCloudGatewayApplication
         }).route(url -> {
 
             LOGGER.info("网关，url：{}", url);
-            return url.path("/baidu/**").filters(header -> header.addRequestHeader("hello", "world")).uri("http://www.baidu.com/**");
+            return url.path("/baidu/**").filters(header -> header.addRequestHeader("hello", "world")).uri("http://www.baidu.com/");
+
+        }).route(url -> {
+
+            LOGGER.info("网关，url：{}", url);
+            return url.path("/shop/**").filters(header -> header.addRequestHeader("hello", "world")).uri("http://localhost:8081/shop");
 
         }).build();
     }
