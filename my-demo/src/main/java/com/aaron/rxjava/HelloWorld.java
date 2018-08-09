@@ -11,6 +11,6 @@ public class HelloWorld
 {
     public static void main(String[] args)
     {
-        Flowable.just("hello world").subscribe(System.out::println);
+        Flowable.fromArray("hello", "world").subscribe(System.out::println);
     }
 }

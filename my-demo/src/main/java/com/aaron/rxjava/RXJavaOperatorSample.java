@@ -69,7 +69,10 @@ public class RXJavaOperatorSample
     public void interval() throws InterruptedException
     {
 
-        Observable.interval(2, TimeUnit.SECONDS).subscribe((result) -> log.info("定时轮询：{}", result));
+        /**
+         * interval：用于轮询，参数是轮询的次数，从0开始
+         */
+        Observable.interval(2, TimeUnit.SECONDS).subscribe((index) -> log.info("定时轮询：{}", index));
 
         TimeUnit.MINUTES.sleep(1);
     }

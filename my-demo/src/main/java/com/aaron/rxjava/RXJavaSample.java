@@ -72,10 +72,23 @@ public class RXJavaSample
             }
 
 
+            /**
+             * 观察者处理完自己的业务逻辑后， 被观察者才能发起下一次调用
+             *
+             * @param o
+             */
             @Override
             public void onNext(Students o)
             {
                 System.out.println("接收到消息：" + o);
+                try
+                {
+                    TimeUnit.SECONDS.sleep(5);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -96,7 +109,7 @@ public class RXJavaSample
             }
         });
 
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.MINUTES.sleep(1);
     }
 
 
@@ -158,6 +171,11 @@ public class RXJavaSample
             emitter.onNext("test4");
             emitter.onNext("test5");
 
+            /**
+             * debounce：用于过滤高频操作，比如重复点击等等
+             *
+             * 当指定的时间间隔过去了，仍旧没有发送数据，那么将会发送最后一个
+             */
         }).debounce(500, TimeUnit.MILLISECONDS).subscribe(new Observer<String>()
         {
             @Override
