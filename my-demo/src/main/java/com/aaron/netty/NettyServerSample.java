@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Netty是基于Java NIO和事件驱动的
+ * <p>
  * Netty的主要构件
  * 1. Channel：是Java NIO的一个基本构件。代表一个到实体的开放连接，如读操作和写操作
  * 2. 回调：一个回调其实就是一个方法，一个指向已经被提供给另外一个方法的方法的引用，用于在适当是时候后者调用前者
