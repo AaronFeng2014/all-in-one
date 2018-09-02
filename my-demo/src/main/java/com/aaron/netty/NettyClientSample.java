@@ -1,17 +1,14 @@
 package com.aaron.netty;
 
+import com.aaron.netty.channelhandler.in.MySimpleChannelInboundHandler;
+import com.aaron.netty.codec.decode.ByteToIntegerMessageDecoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.CharsetUtil;
 import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,30 +34,15 @@ public class NettyClientSample
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception
                         {
-                            channel.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>()
-                            {
-                                @Override
-                                public void channelActive(ChannelHandlerContext ctx) throws Exception
-                                {
-                                    ctx.writeAndFlush(Unpooled.copiedBuffer("我来了哦", CharsetUtil.UTF_8));
-                                }
+                            //入站事件，只能处理流进来的数据
+                            MySimpleChannelInboundHandler channelInboundHandler = new MySimpleChannelInboundHandler();
 
-
-                                @Override
-                                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-                                {
-                                    log.error("异常了哦", cause);
-                                }
-
-
-                                @Override
-                                public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception
-                                {
-                                    log.info("接受到消息：{}", msg.toString(CharsetUtil.UTF_8));
-                                    ctx.writeAndFlush(
-                                            Unpooled.copiedBuffer("已接收到你的消息：" + msg.toString(CharsetUtil.UTF_8), CharsetUtil.UTF_8));
-                                }
-                            });
+                            /*
+                             * 所有的ChannelHandler被添加到ChannelPipeline中，被按顺序链式调用执行
+                             *
+                             * 该处，首先交由ByteToIntegerMessageDecoder处理，其次交给channelInboundHandler处理
+                             */
+                            channel.pipeline().addLast(new ByteToIntegerMessageDecoder()).addLast(channelInboundHandler);
                         }
                     });
 

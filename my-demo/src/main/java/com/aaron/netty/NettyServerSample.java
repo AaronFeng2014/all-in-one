@@ -1,10 +1,11 @@
 package com.aaron.netty;
 
+import com.aaron.netty.channelhandler.in.HeartBeatChannelHandler;
+import com.aaron.netty.channelhandler.out.MyChannelOutboundHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
@@ -12,11 +13,14 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Netty是基于Java NIO和事件驱动的
@@ -51,22 +55,18 @@ public class NettyServerSample
             protected void initChannel(SocketChannel socketChannel) throws Exception
             {
 
-                socketChannel.pipeline().addLast(new ChannelInboundHandlerAdapter()
+                //连接空闲处理器
+                IdleStateHandler idleStateHandler = new IdleStateHandler(10, 10, 10, TimeUnit.SECONDS);
+
+                socketChannel.pipeline().addLast(idleStateHandler).addLast(new ChannelInboundHandlerAdapter()
                 {
 
                     @Override
                     public void channelActive(ChannelHandlerContext ctx) throws Exception
                     {
-                        try
-                        {
-                            ctx.writeAndFlush(byteBuf.duplicate()).addListener(ChannelFutureListener.CLOSE);
+                        log.info("客户端已建立连接：{}", LocalDateTime.now());
 
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-
+                        ctx.writeAndFlush(Unpooled.copiedBuffer("欢迎您", CharsetUtil.UTF_8));
                     }
 
 
@@ -81,7 +81,7 @@ public class NettyServerSample
                     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
                     {
 
-                        log.info("接受到消息了：{}", ((ByteBuf)msg).toString(CharsetUtil.UTF_8));
+                        log.info("接受到客户端发来的消息，内容是：{}", ((ByteBuf)msg).toString(CharsetUtil.UTF_8));
                         ctx.writeAndFlush(
                                 Unpooled.copiedBuffer("已接收到你的消息：" + ((ByteBuf)msg).toString(CharsetUtil.UTF_8), CharsetUtil.UTF_8));
                     }
@@ -114,7 +114,7 @@ public class NettyServerSample
                     {
                         log.error("读取异常", cause);
                     }
-                });
+                }).addLast(new HeartBeatChannelHandler()).addLast(new MyChannelOutboundHandler());
             }
 
         });

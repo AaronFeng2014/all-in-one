@@ -25,6 +25,10 @@ package com.aaron.netty.eventloop;
  *
  * 一个EventLoop啃个被分配给一个或者多个Channel
  *
+ * EventLoopGroup负责为每个新创建的Channel分配EventLoop，一旦某个Channel被分配给某个EventLoop，那么该Channel的整个生命周期内都将使用
+ * 这个EventLoop（以及关联的线程）
+ *
+ *
  * * ChannelFuture接口
  * Netty的所有操作都是一部的，因此需要一个能够在后面的某个时间点确定其返回结果接口，而ChannelFuture正是该接口，其addListener用于注册ChannelFutureListener，便于在完成操作时，得到通知
  *
