@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.FixedLengthFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,10 @@ public class NettyServerSample
                 //连接空闲处理器
                 IdleStateHandler idleStateHandler = new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS);
 
-                socketChannel.pipeline().addLast(idleStateHandler).addLast(new ServerChannelHandler());
+                socketChannel.pipeline()
+                             .addLast(idleStateHandler)
+                             .addLast(new FixedLengthFrameDecoder(4))
+                             .addLast(new ServerChannelHandler());
             }
 
         });

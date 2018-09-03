@@ -2,6 +2,8 @@ package com.aaron.netty;
 
 import com.aaron.netty.channelhandler.in.ClientChannelHandler;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -9,6 +11,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.CharsetUtil;
 import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +50,15 @@ public class NettyClientSample
                      });
 
             ChannelFuture channelFuture = bootstrap.connect().sync();
+
+            channelFuture.addListener((ChannelFuture c) -> {
+
+                if (c.isSuccess())
+                {
+                    ByteBuf byteBuf = Unpooled.copiedBuffer("客户端连接成功， id = " + Thread.currentThread().getName(), CharsetUtil.UTF_8);
+                    c.channel().writeAndFlush(byteBuf);
+                }
+            });
             channelFuture.channel().closeFuture().sync();
         }
         catch (InterruptedException ignore)

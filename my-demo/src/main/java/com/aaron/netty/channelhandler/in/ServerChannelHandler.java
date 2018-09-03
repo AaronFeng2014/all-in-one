@@ -2,6 +2,7 @@ package com.aaron.netty.channelhandler.in;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.CharsetUtil;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +36,6 @@ public class ServerChannelHandler extends AbstractHeartBeatChannelHandler
     @Override
     protected void handleData(ChannelHandlerContext ctx, ByteBuf msg)
     {
-
+        log.info("接收到来自客户端的信息：{}", msg.toString(CharsetUtil.UTF_8));
     }
 }
