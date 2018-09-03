@@ -1,5 +1,6 @@
 package com.aaron.netty;
 
+import com.aaron.netty.channelhandler.in.LoggingChannelHandler;
 import com.aaron.netty.channelhandler.in.ServerChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -51,7 +52,7 @@ public class NettyServerSample
                 IdleStateHandler idleStateHandler = new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS);
 
                 socketChannel.pipeline()
-                             .addLast(idleStateHandler)
+                             .addLast(idleStateHandler).addLast(new LoggingChannelHandler())
                              .addLast(new FixedLengthFrameDecoder(4))
                              .addLast(new ServerChannelHandler());
             }
