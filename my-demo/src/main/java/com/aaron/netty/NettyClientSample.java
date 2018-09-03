@@ -1,7 +1,6 @@
 package com.aaron.netty;
 
-import com.aaron.netty.channelhandler.in.MySimpleChannelInboundHandler;
-import com.aaron.netty.codec.decode.ByteToIntegerMessageDecoder;
+import com.aaron.netty.channelhandler.in.ClientChannelHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -9,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,23 +28,23 @@ public class NettyClientSample
         {
             Bootstrap bootstrap = new Bootstrap();
 
-            bootstrap.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress("localhost", 8080)).handler(
-                    new ChannelInitializer<SocketChannel>()
-                    {
-                        @Override
-                        protected void initChannel(SocketChannel channel) throws Exception
-                        {
-                            //入站事件，只能处理流进来的数据
-                            MySimpleChannelInboundHandler channelInboundHandler = new MySimpleChannelInboundHandler();
+            bootstrap.group(group)
+                     .channel(NioSocketChannel.class)
+                     .remoteAddress(new InetSocketAddress("localhost", 8080))
+                     .handler(new ChannelInitializer<SocketChannel>()
+                     {
+                         @Override
+                         protected void initChannel(SocketChannel channel) throws Exception
+                         {
 
-                            /*
-                             * 所有的ChannelHandler被添加到ChannelPipeline中，被按顺序链式调用执行
-                             *
-                             * 该处，首先交由ByteToIntegerMessageDecoder处理，其次交给channelInboundHandler处理
-                             */
-                            channel.pipeline().addLast(new ByteToIntegerMessageDecoder()).addLast(channelInboundHandler);
-                        }
-                    });
+                             /*
+                              * 所有的ChannelHandler被添加到ChannelPipeline中，被按顺序链式调用执行
+                              *
+                              * 该处，首先交由ByteToIntegerMessageDecoder处理，其次交给channelInboundHandler处理
+                              */
+                             channel.pipeline().addLast(new IdleStateHandler(0, 0, 5)).addLast(new ClientChannelHandler());
+                         }
+                     });
 
             ChannelFuture channelFuture = bootstrap.connect().sync();
             channelFuture.channel().closeFuture().sync();

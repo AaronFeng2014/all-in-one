@@ -1,23 +1,15 @@
 package com.aaron.netty;
 
-import com.aaron.netty.channelhandler.in.HeartBeatChannelHandler;
-import com.aaron.netty.channelhandler.out.MyChannelOutboundHandler;
+import com.aaron.netty.channelhandler.in.ServerChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.CharsetUtil;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -41,7 +33,6 @@ public class NettyServerSample
 
     public static void main(String[] args) throws InterruptedException
     {
-        ByteBuf byteBuf = Unpooled.copiedBuffer("This is my first netty demo! started at " + LocalDateTime.now(), Charset.forName("UTF-8"));
 
         EventLoopGroup group = new NioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -56,65 +47,9 @@ public class NettyServerSample
             {
 
                 //连接空闲处理器
-                IdleStateHandler idleStateHandler = new IdleStateHandler(10, 10, 10, TimeUnit.SECONDS);
+                IdleStateHandler idleStateHandler = new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS);
 
-                socketChannel.pipeline().addLast(idleStateHandler).addLast(new ChannelInboundHandlerAdapter()
-                {
-
-                    @Override
-                    public void channelActive(ChannelHandlerContext ctx) throws Exception
-                    {
-                        log.info("客户端已建立连接：{}", LocalDateTime.now());
-
-                        ctx.writeAndFlush(Unpooled.copiedBuffer("欢迎您", CharsetUtil.UTF_8));
-                    }
-
-
-                    /**
-                     * 对每一个传入的消息都要调用该方法
-                     *
-                     * @param ctx
-                     * @param msg
-                     * @throws Exception
-                     */
-                    @Override
-                    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
-                    {
-
-                        log.info("接受到客户端发来的消息，内容是：{}", ((ByteBuf)msg).toString(CharsetUtil.UTF_8));
-                        ctx.writeAndFlush(
-                                Unpooled.copiedBuffer("已接收到你的消息：" + ((ByteBuf)msg).toString(CharsetUtil.UTF_8), CharsetUtil.UTF_8));
-                    }
-
-
-                    /**
-                     * 通知channelInboundHandler最后一次对channelRead的调用时当前批量读取中的最后一条消息
-                     *
-                     * @param ctx ChannelHandlerContext
-                     * @throws Exception：这里的异常需要自己捕获，如果自己不捕获的话你，那么将会作为
-                     */
-                    @Override
-                    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception
-                    {
-                        ctx.writeAndFlush(Unpooled.copiedBuffer("已接收到你的消息", CharsetUtil.UTF_8));
-                    }
-
-
-                    /**
-                     * 在读取期间有异常时，会调用该方法
-                     * <p>
-                     * 如果该方法没有被实现，那么异常将会一直传递到channelHandlerContext的尾端，并被记录下来
-                     *
-                     * @param ctx
-                     * @param cause
-                     * @throws Exception
-                     */
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-                    {
-                        log.error("读取异常", cause);
-                    }
-                }).addLast(new HeartBeatChannelHandler()).addLast(new MyChannelOutboundHandler());
+                socketChannel.pipeline().addLast(idleStateHandler).addLast(new ServerChannelHandler());
             }
 
         });

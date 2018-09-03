@@ -19,9 +19,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MyChannelFutureListener implements GenericFutureListener<ChannelFuture>
 {
+
+    private Class clazz;
+
+
+    public MyChannelFutureListener(Class clazz)
+    {
+        this.clazz = clazz;
+    }
+
+
     @Override
     public void operationComplete(ChannelFuture future) throws Exception
     {
-        log.info("消息处理完成，即将关闭channel，时间：{}", LocalDateTime.now());
+        log.info("{} --> 消息处理完成，即将关闭channel，时间：{}", clazz.getSimpleName(), LocalDateTime.now());
     }
 }
