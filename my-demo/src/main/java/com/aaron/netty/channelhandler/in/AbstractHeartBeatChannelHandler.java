@@ -2,6 +2,7 @@ package com.aaron.netty.channelhandler.in;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
@@ -83,9 +84,9 @@ public abstract class AbstractHeartBeatChannelHandler extends SimpleChannelInbou
     }
 
 
-    void sendPingMessage(ChannelHandlerContext channelHandlerContext)
+    ChannelFuture sendPingMessage(ChannelHandlerContext channelHandlerContext)
     {
-        channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(PING, CharsetUtil.UTF_8));
+        return channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(PING, CharsetUtil.UTF_8));
     }
 
 

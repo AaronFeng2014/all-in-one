@@ -1,6 +1,7 @@
 package com.aaron.netty.channelhandler.in;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.CharsetUtil;
 import java.time.LocalDateTime;
@@ -14,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServerChannelHandler extends AbstractHeartBeatChannelHandler
 {
+
+    private volatile int failCount = 0;
+
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception
@@ -29,7 +33,22 @@ public class ServerChannelHandler extends AbstractHeartBeatChannelHandler
         log.info("服务端读取数据超时...向客户端发送ping请求");
 
         //发送ping数据，检查客户端是否在线
-        sendPingMessage(ctx);
+        sendPingMessage(ctx).addListener(channelFuture -> {
+
+            if (!channelFuture.isSuccess() && failCount++ >= 5)
+            {
+                log.error("服务端主动关闭连接，失败次数大于5");
+                ctx.channel().close();
+            }
+        });
+
+    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
+    {
+        log.error("异常", cause);
     }
 
 
@@ -37,5 +56,7 @@ public class ServerChannelHandler extends AbstractHeartBeatChannelHandler
     protected void handleData(ChannelHandlerContext ctx, ByteBuf msg)
     {
         log.info("接收到来自客户端的信息：{}", msg.toString(CharsetUtil.UTF_8));
+
+        ctx.writeAndFlush(Unpooled.copiedBuffer("欢迎您", CharsetUtil.UTF_8));
     }
 }
