@@ -5,8 +5,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,17 +20,13 @@ import org.springframework.stereotype.Component;
 public class ChannelPipelineInitializer extends ChannelInitializer<NioSocketChannel>
 {
 
-    private ChannelHandler idleHandler = new IdleStateHandler(60 * 20, 0, 0);
-
-    @Autowired
-    private FileListChannelHandler fileListChannelHandler;
-
-
     @Override
     protected void initChannel(NioSocketChannel socketChannel) throws Exception
     {
         ChannelPipeline pipeline = socketChannel.pipeline();
 
-        pipeline.addLast(idleHandler).addLast(new ServerChannelHandler()).addLast(fileListChannelHandler);
+        ChannelHandler idleHandler = new IdleStateHandler(60 * 20, 0, 0);
+        FileListChannelHandler channelHandler = FtpServer.context.getBean(FileListChannelHandler.class);
+        pipeline.addLast(idleHandler).addLast(new HttpServerCodec()).addLast(new ServerChannelHandler()).addLast(channelHandler);
     }
 }

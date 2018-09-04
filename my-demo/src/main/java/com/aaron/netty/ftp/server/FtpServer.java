@@ -30,11 +30,13 @@ public class FtpServer
      */
     public static final String FTP_SERVER_RESOURCE_LOCATION = "/Users/fenghaixin/logs";
 
+    public static ApplicationContext context;
+
 
     public static void main(String[] args)
     {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext-ftpServer.xml");
+        context = new ClassPathXmlApplicationContext("applicationContext-ftpServer.xml");
 
         ChannelPipelineInitializer initializer = context.getBean(ChannelPipelineInitializer.class);
 

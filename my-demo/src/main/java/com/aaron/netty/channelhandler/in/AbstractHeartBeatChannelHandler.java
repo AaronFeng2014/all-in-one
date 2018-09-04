@@ -114,11 +114,6 @@ public abstract class AbstractHeartBeatChannelHandler extends SimpleChannelInbou
     {
 
         //读取客户端发送的数据完成时，调用该方法
-        /**
-         * 下面代码用于刷新服务器回写给客户端的数据
-         */
-        ctx.flush();
-        log.info("信息接收完成");
     }
 
 

@@ -41,7 +41,7 @@ public class FileServiceImpl implements FileService
         //按文件和文件夹分类一波
         Map<Boolean, List<File>> collect = Stream.of(files).collect(Collectors.groupingBy(File::isDirectory));
 
-        Function<File, String> function = File::getPath;
+        Function<File, String> function = File::getName;
         //文件夹
         List<String> directoryList = collect.getOrDefault(true, Collections.emptyList())
                                             .stream()
