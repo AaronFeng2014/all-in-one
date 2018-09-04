@@ -2,6 +2,7 @@ package com.aaron.netty.ftp.server;
 
 import com.aaron.netty.ftp.server.service.FileService;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -11,9 +12,11 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.GenericFutureListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -59,7 +62,7 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
 
     public FileListChannelHandler()
     {
-        super(false);
+        super(true);
     }
 
 
@@ -76,7 +79,15 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
 
         String filePath = "/".equals(request.uri()) ? FtpServer.FTP_SERVER_RESOURCE_LOCATION : request.uri();
 
+        filePath =  URLDecoder.decode(filePath,"UTF-8");
+
         File file = new File(filePath);
+
+        GenericFutureListener<ChannelFuture> listener = channelFuture -> {
+
+            log.info("数据发送完成，关闭连接");
+            channelFuture.channel().close();
+        };
 
         if (file.isDirectory())
         {
@@ -87,7 +98,7 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
                                                               HttpResponseStatus.OK,
                                                               Unpooled.copiedBuffer(html, CharsetUtil.UTF_8));
             ctx.write(message);
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
         }
         else
         {
@@ -95,7 +106,7 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
 
             //向客户端直接返回文件数据
             ctx.write(Unpooled.copiedBuffer(fileToByteArray));
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
         }
     }
 
@@ -105,12 +116,12 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
         List<String> allFileList = fileService.getAllFileList(file);
 
         String result = TEMPLATE.replaceFirst("\\{currentTime}", LocalDateTime.now().toString());
-        result = result.replace("\\{parent}", "<a href=\"" + file.getPath() + "\">" + file.getName() + "</a>");
+        result = result.replaceFirst("\\{parent}", "<a href=\"" + file.getName() + "\">" + file.getName() + "</a>");
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < allFileList.size(); i++)
         {
             stringBuilder.append("<li><a href=\"")
-                         .append(file.getPath())
+                         .append(file.getName())
                          .append("/")
                          .append(allFileList.get(i))
                          .append("\">")
@@ -119,5 +130,12 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
         }
 
         return result.replaceFirst("\\{content}", stringBuilder.toString());
+    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
+    {
+        log.error("捕获到异常信息", cause);
     }
 }

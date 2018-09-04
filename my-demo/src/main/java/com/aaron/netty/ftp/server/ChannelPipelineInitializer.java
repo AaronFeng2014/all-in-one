@@ -1,6 +1,5 @@
 package com.aaron.netty.ftp.server;
 
-import com.aaron.netty.channelhandler.in.ServerChannelHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -27,6 +26,6 @@ public class ChannelPipelineInitializer extends ChannelInitializer<NioSocketChan
 
         ChannelHandler idleHandler = new IdleStateHandler(60 * 20, 0, 0);
         FileListChannelHandler channelHandler = FtpServer.context.getBean(FileListChannelHandler.class);
-        pipeline.addLast(idleHandler).addLast(new HttpServerCodec()).addLast(new ServerChannelHandler()).addLast(channelHandler);
+        pipeline.addLast(idleHandler).addLast(new HttpServerCodec()).addLast(new FtpServerHeartBeatHandler()).addLast(channelHandler);
     }
 }
