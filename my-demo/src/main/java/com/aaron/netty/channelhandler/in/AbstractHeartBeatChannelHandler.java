@@ -102,7 +102,11 @@ public abstract class AbstractHeartBeatChannelHandler extends SimpleChannelInbou
     }
 
 
-    protected abstract void handleData(ChannelHandlerContext ctx, ByteBuf msg);
+    protected void handleData(ChannelHandlerContext ctx, ByteBuf msg)
+    {
+        //默认交给下一个处理器处理数据
+        ctx.fireChannelRead(msg);
+    }
 
 
     @Override

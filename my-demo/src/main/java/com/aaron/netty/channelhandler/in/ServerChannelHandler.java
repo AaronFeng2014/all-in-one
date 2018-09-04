@@ -23,6 +23,9 @@ public class ServerChannelHandler extends AbstractHeartBeatChannelHandler
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
         log.info("This is my first netty demo! started at " + LocalDateTime.now());
+
+        //下一个ChannelHandler继续处理
+        ctx.fireChannelActive();
     }
 
 

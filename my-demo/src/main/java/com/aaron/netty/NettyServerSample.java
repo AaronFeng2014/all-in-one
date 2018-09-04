@@ -51,8 +51,7 @@ public class NettyServerSample
                 //连接空闲处理器
                 IdleStateHandler idleStateHandler = new IdleStateHandler(10, 0, 0, TimeUnit.SECONDS);
 
-                socketChannel.pipeline()
-                             .addLast(idleStateHandler).addLast(new LoggingChannelHandler())
+                socketChannel.pipeline().addLast(idleStateHandler).addLast(new LoggingChannelHandler())
                              .addLast(new FixedLengthFrameDecoder(4))
                              .addLast(new ServerChannelHandler());
             }

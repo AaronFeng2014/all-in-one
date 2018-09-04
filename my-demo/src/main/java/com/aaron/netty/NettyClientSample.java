@@ -45,7 +45,7 @@ public class NettyClientSample
                               *
                               * 该处，首先交由ByteToIntegerMessageDecoder处理，其次交给channelInboundHandler处理
                               */
-                             channel.pipeline().addLast(new IdleStateHandler(0, 0, 5)).addLast(new ClientChannelHandler());
+                             channel.pipeline().addLast(new IdleStateHandler(0, 0, 60 * 2)).addLast(new ClientChannelHandler());
                          }
                      });
 
