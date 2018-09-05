@@ -77,9 +77,11 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception
     {
 
-        String filePath = "/".equals(request.uri()) ? FtpServer.FTP_SERVER_RESOURCE_LOCATION : request.uri();
+        String filePath = "/".equals(request.uri()) ?
+                FtpServer.FTP_SERVER_RESOURCE_LOCATION :
+                FtpServer.FTP_SERVER_RESOURCE_PREFFIX + request.uri();
 
-        filePath =  URLDecoder.decode(filePath,"UTF-8");
+        filePath = URLDecoder.decode(filePath, "UTF-8");
 
         File file = new File(filePath);
 
@@ -91,6 +93,7 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
 
         if (file.isDirectory())
         {
+
             String html = getFileList(file);
 
             //向客户端会写服务器上指定的文件夹下的文件列表
@@ -116,7 +119,8 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
         List<String> allFileList = fileService.getAllFileList(file);
 
         String result = TEMPLATE.replaceFirst("\\{currentTime}", LocalDateTime.now().toString());
-        result = result.replaceFirst("\\{parent}", "<a href=\"" + file.getName() + "\">" + file.getName() + "</a>");
+        String parent = getParent(file);
+        result = result.replaceFirst("\\{parent}", "<a href=\"" + parent + "\">" + parent + "</a>");
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < allFileList.size(); i++)
         {
@@ -137,5 +141,35 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
     {
         log.error("捕获到异常信息", cause);
+    }
+
+
+    private String getParent(File file)
+    {
+
+        if (isRootDirectory(file.getAbsolutePath()))
+        {
+            return "/";
+        }
+
+        if (isRootDirectory(file.getParentFile().getAbsolutePath()))
+        {
+            return "/";
+        }
+
+        return "../" + file.getParentFile().getName();
+    }
+
+
+    /**
+     * 是否是根目录
+     *
+     * @param path String：文件夹名称
+     *
+     * @return 如果是根目录，返回true，否在返回false
+     */
+    private boolean isRootDirectory(String path)
+    {
+        return FtpServer.FTP_SERVER_RESOURCE_LOCATION.equals(path);
     }
 }
