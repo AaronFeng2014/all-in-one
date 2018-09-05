@@ -38,6 +38,12 @@ import java.util.List;
 public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequest>
 {
 
+    private static final GenericFutureListener<ChannelFuture> FUTURE_LISTENER = channelFuture -> {
+
+        log.info("数据发送完成，关闭连接");
+        channelFuture.channel().close();
+    };
+
     private static String TEMPLATE;
 
     @Autowired
@@ -85,15 +91,10 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
 
         File file = new File(filePath);
 
-        GenericFutureListener<ChannelFuture> listener = channelFuture -> {
-
-            log.info("数据发送完成，关闭连接");
-            channelFuture.channel().close();
-        };
-
         if (file.isDirectory())
         {
 
+            log.info("获取文件夹路径：{}", filePath);
             String html = getFileList(file);
 
             //向客户端会写服务器上指定的文件夹下的文件列表
@@ -101,15 +102,16 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
                                                               HttpResponseStatus.OK,
                                                               Unpooled.copiedBuffer(html, CharsetUtil.UTF_8));
             ctx.write(message);
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(FUTURE_LISTENER);
         }
         else
         {
+            log.info("获取文件路径：{}", filePath);
             byte[] fileToByteArray = FileUtils.readFileToByteArray(file);
 
             //向客户端直接返回文件数据
             ctx.write(Unpooled.copiedBuffer(fileToByteArray));
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(FUTURE_LISTENER);
         }
     }
 
