@@ -4,22 +4,26 @@ import com.aaron.netty.ftp.server.service.FileService;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelProgressiveFuture;
+import io.netty.channel.ChannelProgressiveFutureListener;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -76,6 +80,8 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
         log.error("客户端已连接，id：{}", ctx.channel().id());
+
+        sendFile(ctx, new File("/Users/fenghaixin/logs/service-provider/2018-05-26/info0.log"));
     }
 
 
@@ -107,12 +113,54 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
         else
         {
             log.info("获取文件路径：{}", filePath);
-            byte[] fileToByteArray = FileUtils.readFileToByteArray(file);
+            sendFile(ctx, file);
+        }
+    }
+
+
+    private void sendFile(ChannelHandlerContext ctx, File file)
+    {
+
+        try
+        {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
+
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+
+            response.headers().add("Content-Length", randomAccessFile.length());
+            response.headers().add("Transfer-Encoding", "chunked");
 
             //向客户端直接返回文件数据
-            ctx.write(Unpooled.copiedBuffer(fileToByteArray));
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(FUTURE_LISTENER);
+            ctx.write(response);
+
+            ChunkedFile chunkedFile = new ChunkedFile(randomAccessFile);
+            HttpChunkedInput chunkedInput = new HttpChunkedInput(chunkedFile, LastHttpContent.EMPTY_LAST_CONTENT);
+
+            ctx.writeAndFlush(chunkedInput, ctx.newProgressivePromise()).addListener(new ChannelProgressiveFutureListener()
+            {
+                @Override
+                public void operationComplete(ChannelProgressiveFuture future) throws Exception
+                {
+                    //关闭连接
+                    log.info("文件传输完毕，关闭连接");
+                }
+
+
+                @Override
+                public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) throws Exception
+                {
+                    log.info("文件传输进度：{}", progress / total);
+                }
+            });
+
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT)
+               .addListener((ChannelFuture channelFuture) -> channelFuture.channel().close());
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
 
