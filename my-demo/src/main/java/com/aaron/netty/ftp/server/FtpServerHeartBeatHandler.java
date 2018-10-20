@@ -9,4 +9,9 @@ import com.aaron.netty.channelhandler.in.AbstractHeartBeatChannelHandler;
  */
 public class FtpServerHeartBeatHandler extends AbstractHeartBeatChannelHandler
 {
+
+    public FtpServerHeartBeatHandler()
+    {
+        super(false);
+    }
 }

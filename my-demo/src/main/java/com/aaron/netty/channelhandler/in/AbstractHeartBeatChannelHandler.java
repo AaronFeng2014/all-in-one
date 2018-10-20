@@ -26,6 +26,18 @@ public abstract class AbstractHeartBeatChannelHandler extends SimpleChannelInbou
     private static final String PONG = "pong";
 
 
+    public AbstractHeartBeatChannelHandler()
+    {
+        this(false);
+    }
+
+
+    public AbstractHeartBeatChannelHandler(boolean autoRelease)
+    {
+        super(autoRelease);
+    }
+
+
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception
     {
@@ -98,7 +110,8 @@ public abstract class AbstractHeartBeatChannelHandler extends SimpleChannelInbou
 
     protected void handleReadIdle(ChannelHandlerContext ctx)
     {
-
+        log.info("服务端读取数据超时...向客户端发送ping请求");
+        sendPingMessage(ctx);
     }
 
 

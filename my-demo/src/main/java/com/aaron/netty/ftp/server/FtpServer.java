@@ -30,6 +30,9 @@ public class FtpServer
      */
     public static final String FTP_SERVER_RESOURCE_LOCATION = "D:/data";
 
+    public static final String FTP_SERVER_RESOURCE_PREFFIX = "/Users/fenghaixin/";
+
+
     public static ApplicationContext context;
 
 

@@ -8,11 +8,11 @@ import io.netty.channel.ChannelProgressiveFuture;
 import io.netty.channel.ChannelProgressiveFutureListener;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
@@ -20,9 +20,9 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
-import javax.activation.MimetypesFileTypeMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +30,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * @author FengHaixin
@@ -45,8 +42,13 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequest>
 {
 
+    private static final GenericFutureListener<ChannelFuture> FUTURE_LISTENER = channelFuture -> {
+
+        log.info("数据发送完成，关闭连接");
+        channelFuture.channel().close();
+    };
+
     private static String TEMPLATE;
-    private static String NOT_FOUND_TEMPLATE;
 
     @Autowired
     private FileService fileService;
@@ -55,12 +57,10 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     static
     {
         InputStream resourceAsStream = FileListChannelHandler.class.getClassLoader().getResourceAsStream("template/index.html");
-        InputStream notFounfResourceAsStream = FileListChannelHandler.class.getClassLoader().getResourceAsStream("template/404.html");
 
         try
         {
             TEMPLATE = IOUtils.toString(resourceAsStream);
-            NOT_FOUND_TEMPLATE = IOUtils.toString(notFounfResourceAsStream);
         }
         catch (IOException e)
         {
@@ -80,6 +80,8 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
         log.error("客户端已连接，id：{}", ctx.channel().id());
+
+        sendFile(ctx, new File("/Users/fenghaixin/logs/service-provider/2018-05-26/info0.log"));
     }
 
 
@@ -87,71 +89,78 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception
     {
 
-        String filePath = "/".equals(request.uri()) ? FtpServer.FTP_SERVER_RESOURCE_LOCATION : request.uri();
+        String filePath = "/".equals(request.uri()) ?
+                FtpServer.FTP_SERVER_RESOURCE_LOCATION :
+                FtpServer.FTP_SERVER_RESOURCE_PREFFIX + request.uri();
 
         filePath = URLDecoder.decode(filePath, "UTF-8");
 
         File file = new File(filePath);
 
-        GenericFutureListener<ChannelFuture> listener = channelFuture -> {
-
-            log.info("数据发送完成，关闭连接");
-            channelFuture.channel().close();
-        };
-
-        if (!file.exists())
-        {
-            HttpMessage message = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-                                                              Unpooled.copiedBuffer(NOT_FOUND_TEMPLATE, CharsetUtil.UTF_8));
-            ctx.write(message);
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
-
-            return;
-        }
         if (file.isDirectory())
         {
+
+            log.info("获取文件夹路径：{}", filePath);
             String html = getFileList(file);
 
             //向客户端会写服务器上指定的文件夹下的文件列表
-            HttpMessage message = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(html, CharsetUtil.UTF_8));
+            HttpMessage message = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                                                              HttpResponseStatus.OK,
+                                                              Unpooled.copiedBuffer(html, CharsetUtil.UTF_8));
             ctx.write(message);
-
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(FUTURE_LISTENER);
         }
         else
         {
-            //byte[] fileToByteArray = FileUtils.readFileToByteArray(file);
+            log.info("获取文件路径：{}", filePath);
+            sendFile(ctx, file);
+        }
+    }
 
-            HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK);
-            if (HttpHeaderValues.KEEP_ALIVE.toString().equals(request.headers().get("Connection")))
-            {
-                response.headers().add("Connection", HttpHeaderValues.KEEP_ALIVE);
-            }
-            response.headers().add("Content-Type", new MimetypesFileTypeMap().getContentType(file));
-            response.headers().add("Content-Length", file.length());
-            ctx.write(response);
+
+    private void sendFile(ChannelHandlerContext ctx, File file)
+    {
+
+        try
+        {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
+
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+
+            response.headers().add("Content-Length", randomAccessFile.length());
+            response.headers().add("Transfer-Encoding", "chunked");
+
             //向客户端直接返回文件数据
-            //ctx.write(new ChunkedStream(new FileInputStream(file)));
-            ChannelFuture channelFuture = ctx.write(new ChunkedFile(file, (int)file.length()), ctx.newProgressivePromise());
-            channelFuture.addListener(new ChannelProgressiveFutureListener()
+            ctx.write(response);
+
+            ChunkedFile chunkedFile = new ChunkedFile(randomAccessFile);
+            HttpChunkedInput chunkedInput = new HttpChunkedInput(chunkedFile, LastHttpContent.EMPTY_LAST_CONTENT);
+
+            ctx.writeAndFlush(chunkedInput, ctx.newProgressivePromise()).addListener(new ChannelProgressiveFutureListener()
             {
-                @Override
-                public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) throws Exception
-                {
-                    System.out.println(progress + "/" + total);
-                }
-
-
                 @Override
                 public void operationComplete(ChannelProgressiveFuture future) throws Exception
                 {
-                    System.out.println("done");
+                    //关闭连接
+                    log.info("文件传输完毕，关闭连接");
+                }
+
+
+                @Override
+                public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) throws Exception
+                {
+                    log.info("文件传输进度：{}", progress / total);
                 }
             });
 
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).addListener(listener);
-
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT)
+               .addListener((ChannelFuture channelFuture) -> channelFuture.channel().close());
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -160,12 +169,18 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
         List<String> allFileList = fileService.getAllFileList(file);
 
         String result = TEMPLATE.replaceFirst("\\{currentTime}", LocalDateTime.now().toString());
-        result = result.replaceFirst("\\{parent}", "<a href=\"" + file.getName() + "\">" + file.getName() + "</a>");
+        String parent = getParent(file);
+        result = result.replaceFirst("\\{parent}", "<a href=\"" + parent + "\">" + parent + "</a>");
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < allFileList.size(); i++)
         {
-            stringBuilder.append("<li><a href=\"").append(file.getName()).append("/").append(allFileList.get(i)).append("\">").append(
-                    allFileList.get(i)).append("</a></li>");
+            stringBuilder.append("<li><a href=\"")
+                         .append(file.getName())
+                         .append("/")
+                         .append(allFileList.get(i))
+                         .append("\">")
+                         .append(allFileList.get(i))
+                         .append("</a></li>");
         }
 
         return result.replaceFirst("\\{content}", stringBuilder.toString());
@@ -176,5 +191,35 @@ public class FileListChannelHandler extends SimpleChannelInboundHandler<HttpRequ
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
     {
         log.error("捕获到异常信息", cause);
+    }
+
+
+    private String getParent(File file)
+    {
+
+        if (isRootDirectory(file.getAbsolutePath()))
+        {
+            return "/";
+        }
+
+        if (isRootDirectory(file.getParentFile().getAbsolutePath()))
+        {
+            return "/";
+        }
+
+        return "../" + file.getParentFile().getName();
+    }
+
+
+    /**
+     * 是否是根目录
+     *
+     * @param path String：文件夹名称
+     *
+     * @return 如果是根目录，返回true，否在返回false
+     */
+    private boolean isRootDirectory(String path)
+    {
+        return FtpServer.FTP_SERVER_RESOURCE_LOCATION.equals(path);
     }
 }
