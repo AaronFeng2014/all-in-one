@@ -28,7 +28,7 @@ public class FtpServer
     /**
      * FTP服务器资源地址
      */
-    public static final String FTP_SERVER_RESOURCE_LOCATION = "/Users/fenghaixin/logs";
+    public static final String FTP_SERVER_RESOURCE_LOCATION = "D:/data";
 
     public static ApplicationContext context;
 
