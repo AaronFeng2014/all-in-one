@@ -4,10 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * spring cloud gateway
@@ -17,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
  * @date 2018-05-25
  */
 @SpringBootApplication
-@Configuration
+@EnableConfigurationProperties
+@RestController
 public class SpringCloudGatewayApplication
 {
 
@@ -36,18 +38,13 @@ public class SpringCloudGatewayApplication
 
         return builder.routes().route(url -> {
 
-            LOGGER.info("网关，url：{}", url);
-            return url.path("/consumer/**").filters(header -> header.addResponseHeader("hello", "world")).uri("http://localhost:7775");
+            LOGGER.info("网关，url：{}", url.toString());
 
-        }).route(url -> {
-
-            LOGGER.info("网关，url：{}", url);
-            return url.path("/baidu/**").filters(header -> header.addRequestHeader("hello", "world")).uri("http://www.baidu.com/");
-
-        }).route(url -> {
-
-            LOGGER.info("网关，url：{}", url);
-            return url.path("/shop/**").filters(header -> header.addRequestHeader("hello", "world")).uri("http://localhost:8081/shop");
+            /**
+             * 下面配置的意思：
+             * 把/consumer/**开始的请求都转发到7777端口下，即是ng中的反向代理
+             */
+            return url.path("/consumer/**").filters(header -> header.addResponseHeader("hello", "world")).uri("http://localhost:7777");
 
         }).build();
     }
