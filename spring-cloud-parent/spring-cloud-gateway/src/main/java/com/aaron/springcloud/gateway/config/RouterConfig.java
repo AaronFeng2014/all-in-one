@@ -33,4 +33,11 @@ public class RouterConfig
     {
         return RouterFunctions.route(RequestPredicates.GET("/time"), request -> dateTimeController.timeHandler(request));
     }
+
+
+    @Bean
+    public RouterFunction<ServerResponse> now()
+    {
+        return RouterFunctions.route(RequestPredicates.GET("/now"), request -> dateTimeController.currentTimeHandler(request));
+    }
 }
