@@ -1,4 +1,4 @@
-package com.aaron.springcloud.api;
+package com.aaron.springcloud.api.model;
 
 import lombok.Getter;
 import lombok.Setter;

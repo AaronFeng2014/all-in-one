@@ -2,7 +2,6 @@ package com.aaron.springcloud.gateway.controller;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -32,8 +31,6 @@ public class DateTimeController
 
     public Mono<ServerResponse> currentTimeHandler(ServerRequest request)
     {
-
-        ReactiveRedisTemplate f;
 
         return ServerResponse.ok()
                              .contentType(MediaType.TEXT_EVENT_STREAM)

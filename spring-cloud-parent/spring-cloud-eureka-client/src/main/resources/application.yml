@@ -18,3 +18,12 @@ eureka:
     lease-expiration-duration-in-seconds: 30
     lease-renewal-interval-in-seconds: 10
     prefer-ip-address: true
+
+#feign和hystrix集成，服务降级配置，必须启用才能正常执行服务降级
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  dashboard:
+    enable-ignore-connection-close-header: true

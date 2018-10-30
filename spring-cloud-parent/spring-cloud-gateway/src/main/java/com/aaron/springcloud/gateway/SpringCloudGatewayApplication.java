@@ -5,10 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
+import org.springframework.cloud.gateway.route.builder.PredicateSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.function.Function;
 
 /**
  * spring cloud gateway
@@ -32,20 +38,26 @@ public class SpringCloudGatewayApplication
     }
 
 
+    private Function<GatewayFilterSpec, UriSpec> consumerFilter = gatewayFilterSpec -> gatewayFilterSpec.addResponseHeader("hello",
+                                                                                                                           "world");
+
+    /**
+     * 下面配置的意思：
+     * 把/consumer/**开始的请求都转发到7777端口下，即是ng中的反向代理
+     */
+    private Function<PredicateSpec, Route.AsyncBuilder> consumerRoute = predicateSpec -> predicateSpec.path("/consumer/**")
+                                                                                                      .filters(consumerFilter)
+                                                                                                      .uri("http://7777.local.com:7777");
+
+    private Function<PredicateSpec, Route.AsyncBuilder> providerRoute = predicateSpec -> predicateSpec.path("/provider/**")
+                                                                                                      .filters(consumerFilter)
+                                                                                                      .uri("http://7776.local.com:7776");
+
+
     @Bean
     public RouteLocator rout(RouteLocatorBuilder builder)
     {
 
-        return builder.routes().route(url -> {
-
-            LOGGER.info("网关，url：{}", url.toString());
-
-            /**
-             * 下面配置的意思：
-             * 把/consumer/**开始的请求都转发到7777端口下，即是ng中的反向代理
-             */
-            return url.path("/consumer/**").filters(header -> header.addResponseHeader("hello", "world")).uri("http://localhost:7777");
-
-        }).build();
+        return builder.routes().route(consumerRoute).route(providerRoute).build();
     }
 }

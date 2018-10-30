@@ -1,5 +1,9 @@
 package com.aaron.springcloud.eureka.controller;
 
+import com.aaron.springcloud.api.UserServiceFacade;
+import com.aaron.springcloud.api.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudentController
 {
 
-    @GetMapping ("{id}")
-    public String getStudent(@PathVariable ("id") Long id)
+    @Autowired
+    private UserServiceFacade userServiceFacade;
+
+
+    @GetMapping (value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Student getStudent(@PathVariable ("id") Long id)
     {
-        return "这里是学生" + id;
+        Student student = new Student();
+        student.setName(String.valueOf(id));
+        student = userServiceFacade.queryUserInfo(student, id);
+        return student;
     }
 
 
