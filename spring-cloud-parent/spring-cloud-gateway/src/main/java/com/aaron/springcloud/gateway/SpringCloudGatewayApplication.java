@@ -1,10 +1,15 @@
 package com.aaron.springcloud.gateway;
 
+import com.aaron.springcloud.gateway.ratelimit.MyKeyResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.ratelimit.RateLimiter;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
@@ -12,8 +17,8 @@ import org.springframework.cloud.gateway.route.builder.PredicateSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -25,7 +30,6 @@ import java.util.function.Function;
  */
 @SpringBootApplication
 @EnableConfigurationProperties
-@RestController
 public class SpringCloudGatewayApplication
 {
 
@@ -38,8 +42,21 @@ public class SpringCloudGatewayApplication
     }
 
 
-    private Function<GatewayFilterSpec, UriSpec> consumerFilter = gatewayFilterSpec -> gatewayFilterSpec.addResponseHeader("hello",
-                                                                                                                           "world");
+    @Autowired
+    private RateLimiter rateLimiter;
+
+    /**
+     * 基于redis + Lua脚本实现的分布式接口访频率控制
+     */
+    private Consumer<RequestRateLimiterGatewayFilterFactory.Config> rateLimiterFilter = config -> {
+        config.setRateLimiter(rateLimiter);
+
+        config.setKeyResolver(new MyKeyResolver());
+    };
+
+    private Function<GatewayFilterSpec, UriSpec> consumerFilter = gatewayFilterSpec -> gatewayFilterSpec.addResponseHeader("hello", "world")
+                                                                                                        .requestRateLimiter(
+                                                                                                                rateLimiterFilter);
 
     /**
      * 下面配置的意思：
@@ -59,5 +76,22 @@ public class SpringCloudGatewayApplication
     {
 
         return builder.routes().route(consumerRoute).route(providerRoute).build();
+    }
+
+
+    @Bean
+    public RedisRateLimiter redisRateLimiter()
+    {
+        /*
+         * 第一个参数表示请求速率
+         * 第二个参数表示总的允许请求的次数
+         *
+         * redis脚本中解析这两个参数：
+         * 总次数 / 速率 * 2 在这个时间窗口内，还没有达到总的请求量的话，就清空之前的统计信息，重新计算
+         * 但是如果在这个时间窗口内某个秒达到了最大请求次数的话，在这秒内再次请求会拒绝请求，间隔几面后，会增加剩余可请求次数
+         *
+         * 增加的次数=间隔时间秒数 * 请求速率
+         */
+        return new RedisRateLimiter(5, 25);
     }
 }
