@@ -84,31 +84,19 @@ public class MessageHandlerContext
     {
         MessageHandlerContext context = new MessageHandlerContext();
 
-        MessageHandlerAdapterContext messageHandler1 = new MessageHandlerAdapterContext()
-        {
+        MessageHandlerAdapterContext messageHandler1 = new MessageHandlerAdapterContext("123");
 
-        };
-
-        messageHandler1.setAppId("123");
         messageHandler1.addMessageHandlerAdapter(ReceiveMessageType.ReceiveMessageEvent.VIDEO_MESSAGE.getMessageType(), obj -> {
 
             LOGGER.info("视屏消息事件，视屏内容：{}", obj.get("MediaId"));
         });
 
-        MessageHandlerAdapterContext messageHandler2 = new MessageHandlerAdapterContext()
-        {
-
-        };
-        messageHandler2.setAppId("456");
+        MessageHandlerAdapterContext messageHandler2 = new MessageHandlerAdapterContext("456");
         messageHandler2.addMessageHandlerAdapter(ReceiveMessageType.ReceiveMessageEvent.IMAGE_MESSAGE.getMessageType(), obj -> {
 
             LOGGER.info("图片消息事件，图片内容：{}", obj.get("PicUrl"));
         });
-        MessageHandlerAdapterContext messageHandler3 = new MessageHandlerAdapterContext()
-        {
-
-        };
-        messageHandler3.setAppId("789");
+        MessageHandlerAdapterContext messageHandler3 = new MessageHandlerAdapterContext("789");
         messageHandler3.addMessageHandlerAdapter(ReceiveMessageType.ReceiveMessageEvent.TEXT_MESSAGE.getMessageType(), obj -> {
 
             LOGGER.info("文本消息事件，文本内容：{}", obj.get("Content"));
