@@ -1,7 +1,6 @@
 package com.aaron.wx.handler;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -33,9 +32,18 @@ public class MessageHandlerAdapterContext
      */
     private Map<String, Consumer<Map<String, Object>>> messageHandlerAdapter = new HashMap<>();
 
-    @Getter
-    @Setter
     private String appId;
+
+
+    /**
+     * 构造函数
+     *
+     * @param appId String：指明该处理器adapter处理的消息对应的appId
+     */
+    public MessageHandlerAdapterContext(String appId)
+    {
+        this.appId = appId;
+    }
 
 
     /**
@@ -46,7 +54,7 @@ public class MessageHandlerAdapterContext
      */
     boolean support(String appId)
     {
-        Assert.notNull(this.appId, "未配置appId");
+        Assert.isTrue(StringUtils.isNotEmpty(appId), "未配置appId");
 
         return this.appId.equals(appId);
     }
