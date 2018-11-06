@@ -42,20 +42,20 @@ public class MessageHandlerAdapterContext
      */
     public MessageHandlerAdapterContext(String appId)
     {
+        Assert.isTrue(StringUtils.isNotEmpty(appId), "appId参数不能为空");
+
         this.appId = appId;
     }
 
 
     /**
-     * 消息是否支持被指定消息处理器处理，一般通过消息中的appid来标记
+     * 消息是否支持被指定消息处理器处理，一般通过消息中的appId来标记
      *
      * @param appId String：appId，这里是微信发送的消息中携带的appId
      * @return 当消息能够被该消息器处理的时候返回true
      */
     boolean support(String appId)
     {
-        Assert.isTrue(StringUtils.isNotEmpty(appId), "未配置appId");
-
         return this.appId.equals(appId);
     }
 
