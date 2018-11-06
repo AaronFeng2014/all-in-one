@@ -87,8 +87,6 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     {
         MessageHandlerAdapterContext messageHandler = null;
 
-        messageHandler.setAppId("");
-
         handlerContext.addMessageHandler(messageHandler).addMessageHandler(messageHandler);
     }
 }

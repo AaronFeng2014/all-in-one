@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +75,8 @@ public class MessageHandlerContext
 
     public MessageHandlerContext addMessageHandler(MessageHandlerAdapterContext messageHandler)
     {
+        Assert.notNull(messageHandler, "messageHandler不能为空");
+
         messageHandlerList.add(messageHandler);
 
         return this;

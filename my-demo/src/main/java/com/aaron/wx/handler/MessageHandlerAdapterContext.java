@@ -86,6 +86,8 @@ public class MessageHandlerAdapterContext
      */
     public MessageHandlerAdapterContext addMessageHandlerAdapter(String eventType, Consumer<Map<String, Object>> consumer)
     {
+        Assert.notNull(consumer, "consumer参数不能为空");
+
         messageHandlerAdapter.put(eventType, consumer);
 
         return this;
