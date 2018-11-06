@@ -40,4 +40,19 @@ public final class MessageSend
 
         return true;
     }
+
+
+    public static boolean uploadMediaResource(CostumerMessage costumerMessage)
+    {
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(JSON.toJSONString(costumerMessage));
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(costumerMessage.getUrl(), requestEntity, String.class);
+
+        String responseBody = responseEntity.getBody();
+
+        LOGGER.info("微信服务器返回的状态值：{}", responseBody);
+
+        return true;
+    }
 }

@@ -1,6 +1,5 @@
 package com.aaron.wx.util;
 
-import com.sun.javaws.jnl.XMLUtils;
 import java.io.StringReader;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -23,7 +22,7 @@ import java.util.Map;
 public class XmlUtils
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlUtils.class);
 
 
     public static Map<String, Object> parseToMap(String xml)
@@ -88,11 +87,4 @@ public class XmlUtils
             listNodes(iterator.next(), map);
         }
     }
-
-
-    public static void main(String[] args)
-    {
-        System.out.println(parseToMap("<xml><ToUserName>< ![CDATA[toUser] ]></ToUserName><FromUserName>< ![CDATA[fromUser] ]></FromUserName><CreateTime>1357290913</CreateTime><MsgType>< ![CDATA[voice] ]></MsgType><MediaId>< ![CDATA[media_id] ]></MediaId><Format>< ![CDATA[Format] ]></Format><MsgId>1234567890123456</MsgId></xml>"));
-    }
-
 }
