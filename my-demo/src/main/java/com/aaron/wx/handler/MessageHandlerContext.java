@@ -41,7 +41,8 @@ public class MessageHandlerContext
     {
         if (CollectionUtils.isEmpty(messageHandlerList))
         {
-            LOGGER.warn("没有配置消息处理器");
+            LOGGER.warn("没有配置消息处理器，消息不会被处理，原始消息内容：{}", params);
+
             return;
         }
 

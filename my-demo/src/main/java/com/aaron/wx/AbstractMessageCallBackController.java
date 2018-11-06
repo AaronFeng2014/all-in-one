@@ -38,7 +38,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      */
     private static final String SUCCESS = "SUCCESS";
 
-    private MessageHandlerContext handlerContext = new MessageHandlerContext();
+    protected MessageHandlerContext handlerContext = new MessageHandlerContext();
 
 
     @RequestMapping ("message/callback/{appId}")
@@ -79,14 +79,5 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     void doHandle(String originalParams)
     {
         handlerContext.handleMessageChain(originalParams);
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception
-    {
-        MessageHandlerAdapterContext messageHandler = null;
-
-        handlerContext.addMessageHandler(messageHandler).addMessageHandler(messageHandler);
     }
 }
