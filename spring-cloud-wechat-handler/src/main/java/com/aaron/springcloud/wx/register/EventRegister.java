@@ -1,4 +1,4 @@
-package com.aaron.wx.register;
+package com.aaron.springcloud.wx.register;
 
 import java.util.HashMap;
 import java.util.Map;

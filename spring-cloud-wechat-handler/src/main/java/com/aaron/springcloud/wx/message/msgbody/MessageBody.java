@@ -1,4 +1,4 @@
-package com.aaron.wx.message.msgbody;
+package com.aaron.springcloud.wx.message.msgbody;
 
 import com.alibaba.fastjson.annotation.JSONType;
 

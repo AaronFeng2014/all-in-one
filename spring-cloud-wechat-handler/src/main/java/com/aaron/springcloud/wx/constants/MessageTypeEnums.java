@@ -1,4 +1,4 @@
-package com.aaron.wx.constants;
+package com.aaron.springcloud.wx.constants;
 
 import lombok.Getter;
 
@@ -12,7 +12,10 @@ public enum MessageTypeEnums
 {
     TEXT("text", "文本消息"),
 
-    IMAGE("image", "图片消息");
+    IMAGE("image", "图片消息"),
+
+    MINI_PROGRAM("miniprogrampage", "小程序卡片消息");
+
 
     private String type;
 

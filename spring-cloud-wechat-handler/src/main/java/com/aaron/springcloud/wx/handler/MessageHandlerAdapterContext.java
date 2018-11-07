@@ -1,4 +1,4 @@
-package com.aaron.wx.handler;
+package com.aaron.springcloud.wx.handler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

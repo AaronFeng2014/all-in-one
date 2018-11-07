@@ -247,8 +247,6 @@
             <version>5.0.8.RELEASE</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-redis -->
-
 
     </dependencies>
 

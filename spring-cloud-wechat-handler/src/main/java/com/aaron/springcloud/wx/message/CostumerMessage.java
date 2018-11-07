@@ -1,6 +1,5 @@
-package com.aaron.wx.message;
+package com.aaron.springcloud.wx.message;
 
-import com.aaron.wx.message.msgbody.MessageBody;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,17 +12,17 @@ import lombok.ToString;
  * @description 一句话描述该文件的用途
  * @date 2018-11-05
  */
-@Setter
 @Getter
 @ToString
-public class CostumerMessage<T extends MessageBody>
+public class CostumerMessage
 {
-    @Getter
     @JSONField (deserialize = false)
     private String url;
+
     /**
      * 消息接收者
      */
+    @Setter
     private String touser;
 
     /**
@@ -31,5 +30,10 @@ public class CostumerMessage<T extends MessageBody>
      */
     private String msgtype;
 
-    private T body;
+
+    public CostumerMessage(String msgtype, String url)
+    {
+        this.msgtype = msgtype;
+        this.url = url;
+    }
 }
