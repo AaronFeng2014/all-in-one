@@ -122,9 +122,9 @@ public interface MessageUrl
 
     String CANCELBLACKLISTURL = "https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist";
 
-    String CREATEQRCODETICKETURL = "https://api.weixin.qq.com/cgi-bin/qrcode/create";
+    String CREATE_QRCODE_TICKET_URL = "https://api.weixin.qq.com/cgi-bin/qrcode/create";
 
-    String QRCODEURL = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=";
+    String QRCODE_URL = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=";
 
     String CONVERTSHORTURL = "https://api.weixin.qq.com/cgi-bin/shorturl";
 
