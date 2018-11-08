@@ -1,5 +1,6 @@
 package com.aaron.springcloud.wx.domain;
 
+import com.aaron.springcloud.wx.constants.QrCodeTypeEnum;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,8 @@ public class TemporaryQrCodeRequest extends QrCodeRequest
     public TemporaryQrCodeRequest(String appId, int expireSeconds, String sceneStr)
     {
         super(appId, sceneStr);
+
+        super.setActionName(QrCodeTypeEnum.QR_STR_SCENE.getType());
 
         Assert.isTrue(expireSeconds <= 2592000, "expireSeconds最大值为2592000");
 

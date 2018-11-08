@@ -11,7 +11,7 @@ import lombok.Getter;
  * @description 一句话描述该文件的用途
  * @date 2018/11/8
  */
-public class TemporaryMediaResource
+public class MediaCacheItem
 {
     @Getter
     private String mediaId;
@@ -19,7 +19,7 @@ public class TemporaryMediaResource
     private LocalDateTime createTime = LocalDateTime.now();
 
 
-    public TemporaryMediaResource(String mediaId)
+    public MediaCacheItem(String mediaId)
     {
         this.mediaId = mediaId;
     }

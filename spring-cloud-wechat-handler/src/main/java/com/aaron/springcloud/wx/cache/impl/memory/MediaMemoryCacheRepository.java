@@ -1,7 +1,7 @@
 package com.aaron.springcloud.wx.cache.impl.memory;
 
 import com.aaron.springcloud.wx.cache.MediaCache;
-import com.aaron.springcloud.wx.domain.TemporaryMediaResource;
+import com.aaron.springcloud.wx.domain.MediaCacheItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +25,11 @@ public final class MediaMemoryCacheRepository implements MediaCache
     /**
      * 临时素材缓存
      */
-    private static final Map<String, TemporaryMediaResource> MEDIA_CACHE = new LinkedHashMap<String, TemporaryMediaResource>()
+    private static final Map<String, MediaCacheItem> MEDIA_CACHE = new LinkedHashMap<String, MediaCacheItem>()
     {
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<String, TemporaryMediaResource> eldest)
+        protected boolean removeEldestEntry(Map.Entry<String, MediaCacheItem> eldest)
         {
             boolean overFlow = this.size() > MAX_CACHE_SIZE;
 
@@ -46,7 +46,7 @@ public final class MediaMemoryCacheRepository implements MediaCache
     @Override
     public void saveMedia(String key, String mediaId)
     {
-        TemporaryMediaResource resource = new TemporaryMediaResource(mediaId);
+        MediaCacheItem resource = new MediaCacheItem(mediaId);
 
         MEDIA_CACHE.put(key, resource);
 
@@ -58,7 +58,7 @@ public final class MediaMemoryCacheRepository implements MediaCache
     public String getMedia(String mediaIndex)
     {
 
-        TemporaryMediaResource cacheMedia = MEDIA_CACHE.get(mediaIndex);
+        MediaCacheItem cacheMedia = MEDIA_CACHE.get(mediaIndex);
         if (cacheMedia == null)
         {
             return null;
