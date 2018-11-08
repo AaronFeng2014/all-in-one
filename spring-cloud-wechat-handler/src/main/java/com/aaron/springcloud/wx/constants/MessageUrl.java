@@ -15,6 +15,9 @@ public interface MessageUrl
 
     String SERVERIP_URL = "https://api.weixin.qq.com/cgi-bin/getcallbackip";
 
+    /**
+     * 创建菜单
+     */
     String CREATE_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/create";
 
     String SEARCHMEN_UURL = "https://api.weixin.qq.com/cgi-bin/menu/get";
