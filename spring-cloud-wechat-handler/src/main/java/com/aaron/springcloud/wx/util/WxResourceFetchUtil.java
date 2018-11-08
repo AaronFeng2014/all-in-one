@@ -96,7 +96,6 @@ public final class WxResourceFetchUtil
      * 微信小程序和服务号客服消息发送
      *
      * @param costumerMessage CostumerMessage：待发送的客服消息
-     *
      * @return 发送成功时返回true，否则返回false
      */
     public static boolean sendCustomerMessage(CostumerMessage costumerMessage)
@@ -116,7 +115,6 @@ public final class WxResourceFetchUtil
      *
      * @param mediaResource MediaResource：素材资源信息
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return
      */
     public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun)
@@ -130,11 +128,9 @@ public final class WxResourceFetchUtil
      *
      * @param mediaResource MediaResource：素材资源信息
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return 返回media_id
      */
-    public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource,
-                                                      Function<String, String> accessTokenFun,
+    public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun,
                                                       MediaCache mediaCacheRepository)
     {
         //尝试优先从缓存中获取
@@ -203,7 +199,21 @@ public final class WxResourceFetchUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     * @return 可直接访问的二维码地址
+     */
+    public static String createPermanentQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
+    {
+        QrCodeRequest qrCodeRequest = new QrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
+
+        return doCreateQrCodeWithoutCache(qrCodeRequest, accessTokenFun);
+    }
+
+
+    /**
+     * 创建永久的服务号二维码，带缓存
      *
+     * @param qrCode QrCode：二维码请求
+     * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -219,7 +229,6 @@ public final class WxResourceFetchUtil
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
      * @param qrCodeCacheRepository QrCodeCache：自定义的缓存实现
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun, QrCodeCache qrCodeCacheRepository)
@@ -232,11 +241,25 @@ public final class WxResourceFetchUtil
 
 
     /**
+     * 创建临时的服务号二维码，不使用缓存
+     *
+     * @param qrCode QrCode：二维码请求
+     * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     * @return 可直接访问的二维码地址
+     */
+    public static String createTemporaryQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
+    {
+        TemporaryQrCodeRequest qrCodeRequest = new TemporaryQrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
+
+        return doCreateQrCodeWithoutCache(qrCodeRequest, accessTokenFun);
+    }
+
+
+    /**
      * 创建临时的服务号二维码，使用默认的内存缓存
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -251,7 +274,6 @@ public final class WxResourceFetchUtil
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
      * @param qrCodeCacheRepository QrCodeCache：自定义的缓存实现
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun, QrCodeCache qrCodeCacheRepository)
@@ -262,14 +284,12 @@ public final class WxResourceFetchUtil
     }
 
 
-    private static String doCreateQrCode(QrCodeRequest qrCodeRequest,
-                                         Function<String, String> accessTokenFun,
-                                         QrCodeCache qrCodeCacheRepository)
+    private static String doCreateQrCode(QrCodeRequest qrCodeRequest, Function<String, String> accessTokenFun, QrCodeCache cacheRepository)
     {
 
         long sceneStrHash = qrCodeRequest.getActionInfo().getScene().getSceneStr().hashCode();
 
-        String qrCodeUrl = qrCodeCacheRepository.getQrCode(sceneStrHash);
+        String qrCodeUrl = cacheRepository.getQrCode(sceneStrHash);
 
         if (StringUtils.isNotEmpty(qrCodeUrl))
         {
@@ -278,35 +298,46 @@ public final class WxResourceFetchUtil
 
         synchronized (qrCodeRequest.getActionInfo().getScene().getSceneStr())
         {
+            qrCodeUrl = cacheRepository.getQrCode(sceneStrHash);
             if (StringUtils.isNotEmpty(qrCodeUrl))
             {
                 return qrCodeUrl;
             }
             else
             {
-                String requestUrl = MessageUrl.CREATE_QRCODE_TICKET_URL + accessTokenFun.apply(qrCodeRequest.getAppId());
+                String url = doCreateQrCodeWithoutCache(qrCodeRequest, accessTokenFun);
 
-                HttpEntity<QrCodeRequest> httpEntity = new HttpEntity<>(qrCodeRequest, DEFAULT_HEADER);
+                saveToCache(qrCodeRequest, url, cacheRepository);
 
-                //拿Ticket
-                JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(requestUrl, httpEntity, String.class));
-
-                if (!isSuccess(jsonObject))
-                {
-                    throw new RuntimeException("生成获取二维码的ticket失败");
-                }
-
-                try
-                {
-                    return saveToCache(qrCodeRequest, jsonObject, qrCodeCacheRepository);
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException("出现异常", e);
-                }
+                return url;
             }
         }
 
+    }
+
+
+    private static String doCreateQrCodeWithoutCache(QrCodeRequest qrCodeRequest, Function<String, String> accessTokenFun)
+    {
+        String requestUrl = MessageUrl.CREATE_QRCODE_TICKET_URL + accessTokenFun.apply(qrCodeRequest.getAppId());
+
+        HttpEntity<QrCodeRequest> httpEntity = new HttpEntity<>(qrCodeRequest, DEFAULT_HEADER);
+
+        //拿Ticket
+        JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(requestUrl, httpEntity, String.class));
+
+        if (!isSuccess(jsonObject))
+        {
+            throw new RuntimeException("生成获取二维码的ticket失败");
+        }
+
+        try
+        {
+            return MessageUrl.QRCODE_URL + URLEncoder.encode(jsonObject.getString("ticket"), "UTF-8");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("出现异常", e);
+        }
     }
 
 
@@ -315,7 +346,6 @@ public final class WxResourceFetchUtil
      *
      * @param qrCodeParam MiniProgramQrCodeParam：小程序二维码创建的参数值
      * @param accessToken String：微信服务器要求的accessToken
-     *
      * @return 小程序二维码的字节数组
      */
     public static byte[] createMiniProgramQrCode(MiniProgramQrCodeParam qrCodeParam, String accessToken)
@@ -348,12 +378,10 @@ public final class WxResourceFetchUtil
     }
 
 
-    private static String saveToCache(QrCodeRequest qrCodeRequest, JSONObject jsonObject, QrCodeCache qrCodeCacheRepository)
-            throws Exception
+    private static String saveToCache(QrCodeRequest qrCodeRequest, String qrCodeUrl, QrCodeCache qrCodeCacheRepository)
     {
-        String qrCodeUrl = MessageUrl.QRCODE_URL + URLEncoder.encode(jsonObject.getString("ticket"), "UTF-8");
-
         QrCodeCacheItem cacheItem;
+
         if (qrCodeRequest instanceof TemporaryQrCodeRequest)
         {
             cacheItem = new QrCodeCacheItem(qrCodeUrl, ((TemporaryQrCodeRequest)qrCodeRequest).getExpireSeconds());
