@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -22,6 +24,8 @@ import java.util.function.Consumer;
 public class MessageHandlerAdapterContext
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandlerAdapterContext.class);
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4);
 
     private static final Consumer<Map<String, Object>> DEFAULT_HANDLER_ADAPTER = params -> {
 
@@ -56,7 +60,6 @@ public class MessageHandlerAdapterContext
      * 消息是否支持被指定消息处理器处理，一般通过消息中的appId来标记
      *
      * @param appId String：appId，这里是微信发送的消息中携带的appId
-     *
      * @return 当消息能够被该消息器处理的时候返回true
      */
     boolean support(String appId)
@@ -76,7 +79,8 @@ public class MessageHandlerAdapterContext
 
             try
             {
-                consumer.accept(params);
+                //线程池异步执行
+                EXECUTOR_SERVICE.execute(() -> consumer.accept(params));
             }
             catch (Exception e)
             {
