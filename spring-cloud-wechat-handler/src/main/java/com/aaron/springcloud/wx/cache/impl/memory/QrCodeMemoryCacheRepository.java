@@ -1,4 +1,4 @@
-package com.aaron.springcloud.wx.cache.impl;
+package com.aaron.springcloud.wx.cache.impl.memory;
 
 import com.aaron.springcloud.wx.cache.QrCodeCache;
 import com.aaron.springcloud.wx.domain.QrCodeCacheItem;

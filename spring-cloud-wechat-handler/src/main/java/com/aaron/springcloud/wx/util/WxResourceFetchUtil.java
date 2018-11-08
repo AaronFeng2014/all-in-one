@@ -2,8 +2,8 @@ package com.aaron.springcloud.wx.util;
 
 import com.aaron.springcloud.wx.cache.MediaCache;
 import com.aaron.springcloud.wx.cache.QrCodeCache;
-import com.aaron.springcloud.wx.cache.impl.MediaMemoryCacheRepository;
-import com.aaron.springcloud.wx.cache.impl.QrCodeMemoryCacheRepository;
+import com.aaron.springcloud.wx.cache.impl.memory.MediaMemoryCacheRepository;
+import com.aaron.springcloud.wx.cache.impl.memory.QrCodeMemoryCacheRepository;
 import com.aaron.springcloud.wx.constants.MediaResourceTypeEnum;
 import com.aaron.springcloud.wx.constants.MessageUrl;
 import com.aaron.springcloud.wx.domain.MediaResourceRequest;
