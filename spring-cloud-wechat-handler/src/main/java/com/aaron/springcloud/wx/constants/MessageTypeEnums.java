@@ -14,8 +14,11 @@ public enum MessageTypeEnums
 
     IMAGE("image", "图片消息"),
 
-    MINI_PROGRAM("miniprogrampage", "小程序卡片消息");
+    VIDEO("video", "视频消息"),
 
+    MUSIC("music", "音乐消息"),
+
+    MINI_PROGRAM("miniprogrampage", "小程序卡片消息");
 
     private String type;
 

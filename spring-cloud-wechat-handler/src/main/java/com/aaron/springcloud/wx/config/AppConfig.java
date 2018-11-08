@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * 小程序或者服务号配置信息
+ *
  * @author FengHaixin
  * @description 一句话描述该文件的用途
  * @date 2018/11/6

@@ -28,12 +28,13 @@ public class CostumerMessage
     /**
      * 消息类型
      */
-    private String msgtype;
+    @JSONField (name = "msgtype")
+    private String msgType;
 
 
-    public CostumerMessage(String msgtype, String url)
+    public CostumerMessage(String msgType, String url)
     {
-        this.msgtype = msgtype;
+        this.msgType = msgType;
         this.url = url;
     }
 }

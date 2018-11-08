@@ -31,10 +31,12 @@ public class AppConfigurations
 
         for (AppConfig appConfig : appConfigList)
         {
-            if (appConfig.getAppId().equals(appId))
+            if (!appConfig.getAppId().equals(appId))
             {
-                return appConfig.getToken();
+                continue;
             }
+
+            return appConfig.getToken();
         }
 
         throw new RuntimeException("未找到" + appId + "对应的token");
