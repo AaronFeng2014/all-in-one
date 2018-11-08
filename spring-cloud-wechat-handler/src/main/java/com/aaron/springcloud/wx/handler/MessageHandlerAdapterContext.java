@@ -77,15 +77,18 @@ public class MessageHandlerAdapterContext
         //查找事件注册的处理器adapter
         messageHandlerAdapters.getOrDefault(type, Collections.singletonList(DEFAULT_HANDLER_ADAPTER)).forEach(consumer -> {
 
-            try
-            {
-                //线程池异步执行
-                EXECUTOR_SERVICE.execute(() -> consumer.accept(params));
-            }
-            catch (Exception e)
-            {
-                LOGGER.error("事件处理错误，事件类型：{}", type, e);
-            }
+            //线程池异步执行
+            EXECUTOR_SERVICE.execute(() -> {
+                try
+                {
+                    consumer.accept(params);
+
+                }
+                catch (Exception e)
+                {
+                    LOGGER.error("事件处理错误，事件类型：{}", type, e);
+                }
+            });
 
         });
 
