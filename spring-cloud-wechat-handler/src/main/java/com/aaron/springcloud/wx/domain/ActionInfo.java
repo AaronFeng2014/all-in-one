@@ -13,7 +13,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-class ActionInfo
+public class ActionInfo
 {
 
     @JSONField (name = "scene")

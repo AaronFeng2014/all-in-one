@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * 微信消息回调事件处理器，该类是一个抽象类，需要用户实现该类，并实现该类中唯一需要实现的方法afterPropertiesSet {@link org.springframework.beans.factory.InitializingBean}
@@ -53,8 +54,16 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     protected MessageHandlerContext handlerContext = new MessageHandlerContext();
 
 
-    @RequestMapping ("message/callback/{appId}")
-    public String handle(@PathVariable ("appId") String appId, HttpServletRequest request)
+    /**
+     * GET方法用于微信开放平台配置回调地址时的token验证
+     *
+     * @param appId String：小程序或者服务号对应的appId
+     * @param request HttpServletRequest：HttpServletRequest请求对象
+     *
+     * @return 如果微信token认证成功，那么返回微信请求中携带的echoStr字符串
+     */
+    @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.GET)
+    public String wxConnection(@PathVariable ("appId") String appId, HttpServletRequest request)
     {
 
         String echoStr = checkConnection(appId, request);
@@ -63,18 +72,52 @@ public abstract class AbstractMessageCallBackController implements InitializingB
             return echoStr;
         }
 
+        return SUCCESS;
+    }
+
+
+    /**
+     * POST方法，用户微信的消息回调
+     * <p>
+     * 核心逻辑异步处理，这是微信推荐的处理方式
+     *
+     * @param appId String：小程序或者服务号对应的appId
+     * @param request HttpServletRequest：HttpServletRequest请求对象
+     *
+     * @return 直接返回 "success" 字符串
+     */
+    @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.POST)
+    public String messageCallBackHandle(@PathVariable ("appId") String appId, HttpServletRequest request)
+    {
+
+        //异步解析消息，并处理相关的逻辑
+        asyncDoHandle(request);
+
+        return SUCCESS;
+    }
+
+
+    /**
+     * 异步，核心逻辑处理
+     *
+     * @param request HttpServletRequest：HttpServletRequest请求对象
+     */
+    @Async
+    void asyncDoHandle(HttpServletRequest request)
+    {
+        String originalParams;
         try
         {
-            String params = IOUtils.toString(request.getInputStream(), Charset.defaultCharset());
-
-            doHandle(params);
+            originalParams = IOUtils.toString(request.getInputStream(), Charset.defaultCharset());
         }
         catch (IOException e)
         {
             LOGGER.error("参数解析异常", e);
+
+            return;
         }
 
-        return SUCCESS;
+        handlerContext.handleMessageChain(originalParams);
     }
 
 
@@ -114,17 +157,5 @@ public abstract class AbstractMessageCallBackController implements InitializingB
 
             return "";
         }
-    }
-
-
-    /**
-     * 异步，核心逻辑处理
-     *
-     * @param originalParams String：微信回调的原始参数
-     */
-    @Async
-    void doHandle(String originalParams)
-    {
-        handlerContext.handleMessageChain(originalParams);
     }
 }

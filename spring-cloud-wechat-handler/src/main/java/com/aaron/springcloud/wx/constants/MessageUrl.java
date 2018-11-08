@@ -74,7 +74,10 @@ public interface MessageUrl
 
     String AUTOREPLYURL = "https://api.weixin.qq.com/cgi-bin/get_current_autoreply_info";
 
-    String UPLOADTEMPMEDIAURL = "https://api.weixin.qq.com/cgi-bin/media/upload";
+    /**
+     * 媒体资源上传接口
+     */
+    String UPLOAD_TEMP_MEDIA_URL = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=";
 
     String GETTEMPMEDIAURL = "https://api.weixin.qq.com/cgi-bin/media/get";
 
@@ -122,9 +125,17 @@ public interface MessageUrl
 
     String CANCELBLACKLISTURL = "https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist";
 
-    String CREATE_QRCODE_TICKET_URL = "https://api.weixin.qq.com/cgi-bin/qrcode/create";
+    /**
+     * 服务号二维码生成ticket地址
+     */
+    String CREATE_QRCODE_TICKET_URL = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=";
 
     String QRCODE_URL = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=";
+
+    /**
+     * 小程序二维码生成地址
+     */
+    String MINIPROGRAM_QRCODE_URL = "http://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=";
 
     String CONVERTSHORTURL = "https://api.weixin.qq.com/cgi-bin/shorturl";
 

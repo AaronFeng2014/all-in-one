@@ -16,6 +16,10 @@ import lombok.ToString;
 @ToString
 public class QrCodeRequest
 {
+
+    @JSONField (serialize = false)
+    private String appId;
+
     @JSONField (name = "action_name")
     private String actionName = QrCodeTypeEnum.QR_LIMIT_STR_SCENE.getType();
 
@@ -23,8 +27,9 @@ public class QrCodeRequest
     private ActionInfo actionInfo;
 
 
-    public QrCodeRequest(String sceneStr)
+    public QrCodeRequest(String appId, String sceneStr)
     {
+        this.appId = appId;
         this.actionInfo = new ActionInfo(sceneStr);
     }
 }
