@@ -72,7 +72,7 @@ public class MessageHandlerContext
         //一个处理器都没有被匹配到，提示一个警告信息
         if (!hasHandle.get())
         {
-            LOGGER.warn("未找到对应的消息处理器，消息未被消费，请检查消息处理器配置是否正确配置，appId：{}", appId);
+            LOGGER.warn("未找到对应的消息处理器，消息未被消费，请检查是否为appId为{}的小程序或者服务号配置了消息处理器", appId);
         }
 
     }
