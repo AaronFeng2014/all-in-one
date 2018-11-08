@@ -50,7 +50,7 @@ public final class MediaMemoryCacheRepository implements MediaCache
 
         MEDIA_CACHE.put(key, resource);
 
-        LOGGER.info("以保存到缓存，mediaId：{}，key：{}", mediaId, key);
+        LOGGER.info("已保存到缓存，mediaId：{}，key：{}", mediaId, key);
     }
 
 

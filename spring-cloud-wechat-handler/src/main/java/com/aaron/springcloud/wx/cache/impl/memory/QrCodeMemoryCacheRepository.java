@@ -46,6 +46,8 @@ public class QrCodeMemoryCacheRepository implements QrCodeCache
     public void saveQrCode(long hash, QrCodeCacheItem qrCodeCacheItem)
     {
         QRCODE_CACHE.put(hash, qrCodeCacheItem);
+
+        LOGGER.info("已保存到缓存，QrCodeUrl：{}，key：{}", qrCodeCacheItem.getQrCodeUrl(), hash);
     }
 
 
