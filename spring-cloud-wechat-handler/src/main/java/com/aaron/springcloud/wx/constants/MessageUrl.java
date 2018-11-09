@@ -11,6 +11,9 @@ public interface MessageUrl
 {
     String WX_DOMAIN = "api.weixin.qq.com";
 
+    /**
+     * 接口调用凭证获取地址
+     */
     String ACCESSTOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential";
 
     String SERVERIP_URL = "https://api.weixin.qq.com/cgi-bin/getcallbackip";
@@ -18,7 +21,7 @@ public interface MessageUrl
     /**
      * 创建菜单
      */
-    String CREATE_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/create";
+    String CREATE_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=";
 
     String SEARCHMEN_UURL = "https://api.weixin.qq.com/cgi-bin/menu/get";
 

@@ -1,6 +1,27 @@
 ## 微信小程序和服务号消息处理
 
+该工具包主要提供了与业务无关的，微信消息发送，资源文件上传等相关功能，并带有缓存接口，使用者可以自动以缓存实现
+
 ### 功能介绍
+
+1. 微信资源上传与消息发送
+
+    **缓存介绍**
+    
+       在二维码生成和媒体资源上传时，默认使用了简单的内存缓存
+       二维码缓存接口QrCodeCache，媒体资源缓存接口MideaCache，
+       如果用户不使用内存缓存，可以通过带缓存参数的接口，传入自定义的缓存实现（如redis，mysql等）
+       
+       
+2. 小程序消息解密和token认证解密
+3. endpoint暴露方式
+      
+       **AbstractMessageCallBackController**抽象类中自动暴露了2个endpoints
+       
+       a. GET：/contextPath/message/callback/{appId}，用于微信公众平台后台配置回调地址时，认证token使用
+       b. POST：/contextPath/message/callback/{appId}，用户微信回调使用，开发者可以根据回调参数做不同的业务逻辑
+       
+       **注意：**以上2个endponits必须保证path一致，不要随意更改
 
 ### 接入指南
 
