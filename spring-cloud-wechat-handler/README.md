@@ -16,12 +16,12 @@
 2. 小程序消息解密和token认证解密
 3. endpoint暴露方式
       
-       **AbstractMessageCallBackController**抽象类中自动暴露了2个endpoints
+       AbstractMessageCallBackController抽象类中自动暴露了2个endpoints
        
        a. GET：/contextPath/message/callback/{appId}，用于微信公众平台后台配置回调地址时，认证token使用
        b. POST：/contextPath/message/callback/{appId}，用户微信回调使用，开发者可以根据回调参数做不同的业务逻辑
        
-       **注意：**以上2个endponits必须保证path一致，不要随意更改
+      **注意**：以上2个endponits必须保证path一致，不要随意更改
 
 ### 接入指南
 
@@ -44,14 +44,35 @@
                 - appId: appId2
                   token: token2
                   encodingAesKeyencodingAesKey: encodingAesKeyencodingAesKey2
-3. java基础实现
+3. Controller实现
+      
+       接入的应用需要有一个controller实现 **AbstractMessageCallBackController**（该controller会自动暴露endpoints） 并实现一个需要唯一实现的方法 **afterPropertiesSet**
+
+4. 关心的回调事件与对应的处理器注册
         
-       a.接入的应用需要有一个controller实现 **AbstractMessageCallBackController**（该controller会自动暴露endpoints） 并实现一个需要唯一实现的方法 **afterPropertiesSet**
-       b.在该方法中注册相应的MessageHandlerContext 和 MessageHandlerAdapterContext，形式如下
+       在第3步实现的方法中注册相应的MessageHandlerContext 和 MessageHandlerAdapterContext，形式如下
             
-            //申明一个MessageHandlerAdapterContext，对应一个appId下的事件处理，同一个appId可以注册多个MessageHandlerAdapterContext
-            MessageHandlerAdapterContext context = new MessageHandlerAdapterContext("appId");
+        //申明一个MessageHandlerAdapterContext，对应一个appId下的事件处理，同一个appId可以注册多个MessageHandlerAdapterContext
+        MessageHandlerAdapterContext context = new MessageHandlerAdapterContext("appId");
             
-            ontext.addMessageHandlerAdapter(ReceiveMessageType.ReceiveEventPushEnum.SUBSCRIBE_EVENT.getEventType(), params -> {},params -> {});
-                    
-            handlerContext.addMessageHandler(context);
+        //这里是注册一个事件对应的处理器
+        context.addMessageHandlerAdapter(WxCallBackTypeEnum.SUBSCRIBE_EVENT, MessageHandlerAdapter ... MessageHandlerAdapter);
+        
+        //这里是注册一个小程序或者公众号对应的处理器
+        handlerContext.addMessageHandler(context);
+            
+5. 自定义功能逻辑实现
+
+       在自定义的逻辑处理器中需要用户自行实现MessageHandlerAdapter接口，并实现accpt方法，在该方法中实现业务逻辑，
+       
+       For example：
+       
+       public class WelcomeHandler implements MessageHandlerAdapter
+       {
+       
+           @Override
+           public void accept(Map<String, String> params)
+           {
+               System.out.println("在这里实现你的业务");
+           }
+       }

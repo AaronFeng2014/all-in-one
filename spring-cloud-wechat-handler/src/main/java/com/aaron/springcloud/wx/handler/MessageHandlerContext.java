@@ -51,7 +51,7 @@ public class MessageHandlerContext
         }
 
         //xml参数解析
-        Map<String, Object> formatParams = XmlUtils.parseToMap(params);
+        Map<String, String> formatParams = XmlUtils.parseToMap(params);
 
         //服务号或小程序appId
         String appId = (String)formatParams.get("ToUserName");
@@ -90,7 +90,7 @@ public class MessageHandlerContext
 
     private static class XmlUtils
     {
-        static Map<String, Object> parseToMap(String xml)
+        static Map<String, String> parseToMap(String xml)
         {
             return parseXml(xml);
         }
@@ -100,10 +100,9 @@ public class MessageHandlerContext
          * 解析XML为Document对象
          *
          * @param xml 被解析的XMl
-         *
          * @return Document
          */
-        private static Map<String, Object> parseXml(String xml)
+        private static Map<String, String> parseXml(String xml)
         {
             Document document;
 
@@ -129,7 +128,7 @@ public class MessageHandlerContext
 
             List<Element> elements = document.getRootElement().elements();
 
-            return elements.stream().collect(Collectors.toMap(Element::getName, Element::getData));
+            return elements.stream().collect(Collectors.toMap(Element::getName, ele -> String.valueOf(ele.getData())));
         }
     }
 }
