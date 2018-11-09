@@ -27,15 +27,12 @@ public class MessageHandlerAdapterContext
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4);
 
-    private static final MessageHandlerAdapter DEFAULT_HANDLER_ADAPTER = new MessageHandlerAdapter(){
-        @Override
-        public void accept(Map<String, String> params)
-        {
-            //获取事件类型, 微信回调中事件类型和消息类型的区分,两者是不同的字段
-            String type = params.getOrDefault("Event", params.getOrDefault("MsgType", "")).toString();
+    private static final MessageHandlerAdapter DEFAULT_HANDLER_ADAPTER = params -> {
 
-            LOGGER.warn("未注册相应的事件处理器，事件类型：{}", type);
-        }
+        //获取事件类型, 微信回调中事件类型和消息类型的区分,两者是不同的字段
+        String type = params.getOrDefault("Event", params.getOrDefault("MsgType", ""));
+
+        LOGGER.warn("未注册相应的事件处理器，事件类型：{}", type);
     };
 
     /**

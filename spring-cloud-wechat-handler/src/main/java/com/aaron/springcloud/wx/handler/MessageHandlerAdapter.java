@@ -16,14 +16,3 @@ public interface MessageHandlerAdapter extends Consumer<Map<String, String>>
 {
 
 }
-
-
-class WelcomeHandler implements MessageHandlerAdapter
-{
-
-    @Override
-    public void accept(Map<String, String> params)
-    {
-        System.out.println("在这里实现你的业务");
-    }
-}
