@@ -26,6 +26,8 @@
 ### 接入指南
 
 1. maven引入方式
+       
+       ......
 
 2. 配置文件配置方式
     
@@ -43,7 +45,9 @@
                   encodingAesKeyencodingAesKey: encodingAesKeyencodingAesKey1
                 - appId: appId2
                   token: token2
-                  encodingAesKeyencodingAesKey: encodingAesKeyencodingAesKey2
+                  encodingAesKeyencodingAesKey: encodingAesKeyencodingAesKey2           
+      **提示：** 需要包com.aaron.springcloud.wx被spring扫描到
+      
 3. Controller实现
       
        接入的应用需要有一个controller实现 **AbstractMessageCallBackController**（该controller会自动暴露endpoints） 并实现一个需要唯一实现的方法 **afterPropertiesSet**
@@ -76,3 +80,8 @@
                System.out.println("在这里实现你的业务");
            }
        }
+       
+**环境需求：**
+
+    jdk 1.8+
+    spring 4+
