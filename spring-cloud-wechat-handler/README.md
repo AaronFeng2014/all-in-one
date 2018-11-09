@@ -18,8 +18,8 @@
       
        AbstractMessageCallBackController抽象类中自动暴露了2个endpoints
        
-       a. GET：/contextPath/message/callback/{appId}，用于微信公众平台后台配置回调地址时，认证token使用
-       b. POST：/contextPath/message/callback/{appId}，用户微信回调使用，开发者可以根据回调参数做不同的业务逻辑
+       a. GET：/{contextPath}/message/callback/{appId}，用于微信公众平台后台配置回调地址时，认证token使用
+       b. POST：/{contextPath}/message/callback/{appId}，用户微信回调使用，开发者可以根据回调参数做不同的业务逻辑
        
       **注意**：以上2个endponits必须保证path一致，不要随意更改
 
