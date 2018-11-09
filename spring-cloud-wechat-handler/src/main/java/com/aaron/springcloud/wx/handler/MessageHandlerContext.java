@@ -54,10 +54,10 @@ public class MessageHandlerContext
         Map<String, String> formatParams = XmlUtils.parseToMap(params);
 
         //服务号或小程序appId
-        String appId = (String)formatParams.get("ToUserName");
+        String appId = formatParams.get("ToUserName");
 
         // 发送者openid
-        String senderOpenId = (String)formatParams.get("FromUserName");
+        String senderOpenId = formatParams.get("FromUserName");
 
         LOGGER.info("接收到来自{}的消息，消息内容是：{}", senderOpenId, JSON.toJSONString(formatParams));
 
