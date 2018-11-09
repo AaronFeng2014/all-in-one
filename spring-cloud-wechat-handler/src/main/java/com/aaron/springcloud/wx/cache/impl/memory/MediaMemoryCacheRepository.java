@@ -2,6 +2,7 @@ package com.aaron.springcloud.wx.cache.impl.memory;
 
 import com.aaron.springcloud.wx.cache.MediaCache;
 import com.aaron.springcloud.wx.domain.MediaCacheItem;
+import com.aaron.springcloud.wx.exception.ExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public final class MediaMemoryCacheRepository implements MediaCache
 
             if (overFlow)
             {
-                LOGGER.warn("缓存容器已满，删除存留时间最长的数据，key：{}，mediaID：{}", eldest.getKey(), eldest.getValue().getMediaId());
+                LOGGER.warn("缓存容器已满，删除存留时间最长的数据，key：{}}", eldest.getKey());
             }
 
             return overFlow;
@@ -59,22 +60,26 @@ public final class MediaMemoryCacheRepository implements MediaCache
     {
 
         MediaCacheItem cacheMedia = MEDIA_CACHE.get(mediaIndex);
+
         if (cacheMedia == null)
         {
             return null;
         }
-
-        if (cacheMedia.isExpired())
+        try
         {
-            LOGGER.info("资源已过期，从缓存中移除，media_id：{}", cacheMedia.getMediaId());
+            String mediaId = cacheMedia.getMediaId();
+
+            LOGGER.info("从缓存中加载到资源，media_id：{}", mediaId);
+
+            return mediaId;
+        }
+        catch (ExpiredException e)
+        {
+            LOGGER.info("资源已过期，从缓存中移除，key：{}", mediaIndex);
+
             MEDIA_CACHE.remove(mediaIndex);
 
             return null;
-        }
-        else
-        {
-            LOGGER.info("从缓存中加载到资源，media_id：{}", cacheMedia.getMediaId());
-            return cacheMedia.getMediaId();
         }
     }
 }

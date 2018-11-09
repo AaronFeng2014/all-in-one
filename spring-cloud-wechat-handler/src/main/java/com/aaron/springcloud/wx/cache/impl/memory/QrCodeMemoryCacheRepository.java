@@ -2,6 +2,7 @@ package com.aaron.springcloud.wx.cache.impl.memory;
 
 import com.aaron.springcloud.wx.cache.QrCodeCache;
 import com.aaron.springcloud.wx.domain.QrCodeCacheItem;
+import com.aaron.springcloud.wx.exception.ExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class QrCodeMemoryCacheRepository implements QrCodeCache
 
             if (overFlow)
             {
-                LOGGER.warn("缓存容器已满，删除存留时间最长的数据，key：{}，QrCodeUrl：{}", eldest.getKey(), eldest.getValue().getQrCodeUrl());
+                LOGGER.warn("缓存容器已满，删除存留时间最长的数据，key：{}", eldest.getKey());
             }
 
             return overFlow;
@@ -45,9 +46,15 @@ public class QrCodeMemoryCacheRepository implements QrCodeCache
     @Override
     public void saveQrCode(long hash, QrCodeCacheItem qrCodeCacheItem)
     {
-        QRCODE_CACHE.put(hash, qrCodeCacheItem);
-
-        LOGGER.info("已保存到缓存，QrCodeUrl：{}，key：{}", qrCodeCacheItem.getQrCodeUrl(), hash);
+        try
+        {
+            LOGGER.info("已保存到缓存，QrCodeUrl：{}，key：{}", qrCodeCacheItem.getQrCodeUrl(), hash);
+            QRCODE_CACHE.put(hash, qrCodeCacheItem);
+        }
+        catch (ExpiredException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 
@@ -55,21 +62,26 @@ public class QrCodeMemoryCacheRepository implements QrCodeCache
     public String getQrCode(long hash)
     {
         QrCodeCacheItem qrCodeCacheItem = QRCODE_CACHE.get(hash);
+
         if (qrCodeCacheItem == null)
         {
             return "";
         }
 
-        if (!qrCodeCacheItem.isExpired())
+        try
         {
-            LOGGER.info("从缓存中加载到资源，QrCodeUrl：{}", qrCodeCacheItem.getQrCodeUrl());
-            return qrCodeCacheItem.getQrCodeUrl();
+            String qrCodeUrl = qrCodeCacheItem.getQrCodeUrl();
+            LOGGER.info("从缓存中加载到资源，QrCodeUrl：{}", qrCodeUrl);
+            return qrCodeUrl;
         }
+        catch (ExpiredException e)
+        {
+            //移除缓存
+            LOGGER.info("资源已过期，从缓存中移除，key：{}", hash);
 
-        //移除缓存
-        LOGGER.info("资源已过期，从缓存中移除，QrCodeUrl：{}", qrCodeCacheItem.getQrCodeUrl());
-        QRCODE_CACHE.remove(hash);
+            QRCODE_CACHE.remove(hash);
 
-        return "";
+            return "";
+        }
     }
 }
