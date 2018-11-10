@@ -21,6 +21,7 @@ import com.aaron.springcloud.wx.message.CostumerMessage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -28,15 +29,21 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileUrlResource;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 
 import java.util.function.Function;
@@ -60,7 +67,7 @@ public final class WxResourceFetchUtil extends BaseUtil
     /**
      * 默认的二维码内存缓存实现
      */
-    private static final CacheItem<QrCodeCacheItem> DEFAULT_QRCODE_CACHE = new QrCodeMemoryCacheRepository();
+    private static final CacheItem<QrCodeCacheItem> DEFAULT_QR_CODE_CACHE = new QrCodeMemoryCacheRepository();
 
     /**
      * 默认的accessToken内存缓存实现
@@ -82,6 +89,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      * 默认使用内存缓存
      *
      * @param appConfig AppConfig：小程序或者公众号的配置信息
+     *
      * @return 返回accesstoken
      */
     public static String getAccessToken(AppConfig appConfig)
@@ -100,6 +108,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      * 不适用缓存，每次从微信获取最新的数据
      *
      * @param appConfig AppConfig：小程序或者公众号的配置信息
+     *
      * @return 返回accesstoken
      */
     public static String getAccessTokenWithoutCache(AppConfig appConfig)
@@ -115,6 +124,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param appConfig AppConfig：小程序或者公众号的配置信息
      * @param cacheRepository CacheItem<AccessTokenCacheItem>：自定义缓存实现
+     *
      * @return 返回accesstoken
      */
     public static String getAccessToken(AppConfig appConfig, CacheItem<AccessTokenCacheItem> cacheRepository)
@@ -137,6 +147,9 @@ public final class WxResourceFetchUtil extends BaseUtil
 
             AccessTokenCacheItem cacheItem = doGetAccessToken(appConfig);
 
+            //保存缓存
+            cacheRepository.save(appConfig.getAppId(), cacheItem);
+
             return cacheItem.getAccessToken();
         }
     }
@@ -146,6 +159,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      * 微信小程序和服务号客服消息发送
      *
      * @param costumerMessage CostumerMessage：待发送的客服消息
+     *
      * @return 发送成功时返回true，否则返回false
      */
     public static boolean sendCustomerMessage(CostumerMessage costumerMessage)
@@ -171,6 +185,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param mediaResource MediaResource：素材资源信息
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     *
      * @return
      */
     public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun)
@@ -180,11 +195,33 @@ public final class WxResourceFetchUtil extends BaseUtil
 
 
     /**
+     * 微信媒体资源上传，不适用任何缓存
+     *
+     * @param mediaResource MediaResource：素材资源信息
+     * @param accessToken String： accessToken
+     *
+     * @return
+     */
+    public static String uploadTemporaryMediaResourceWithoutCache(MediaResourceRequest mediaResource, String accessToken)
+    {
+        try
+        {
+            return doUploadTemporaryMediaResource(mediaResource, accessToken);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("资源上传错误", e);
+        }
+    }
+
+
+    /**
      * 微信媒体资源上传，该方法可以自定义缓存实现
      *
      * @param mediaResource MediaResource：素材资源信息
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
      * @param mediaCacheRepository CacheItem<MediaCacheItem>： 自定义的缓存实现
+     *
      * @return 返回media_id
      */
     public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun,
@@ -212,39 +249,14 @@ public final class WxResourceFetchUtil extends BaseUtil
 
             try
             {
-                FileUrlResource resource = new FileUrlResource(mediaResource.getResourceUrl());
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-                headers.setConnection("Keep-Alive");
-                headers.setCacheControl("no-cache");
-                MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                String accessToken = accessTokenFun.apply(mediaResource.getAppId());
+                mediaId = doUploadTemporaryMediaResource(mediaResource, accessToken);
 
-                byte[] byteArray = IOUtils.toByteArray(mediaResource.getResourceUrl());
-                body.add("file", byteArray);
-                body.add("filelength", String.valueOf(byteArray.length));
-                body.add("filename", FilenameUtils.getName(mediaResource.getResourceUrl().getPath()));
-                body.add("content-type", "multipart/form-data");
+                //写入到缓存中
+                mediaCacheRepository.save(key, new MediaCacheItem(mediaId));
 
-                HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-                String appId = mediaResource.getAppId();
-
-                String url = MessageUrl.UPLOAD_TEMP_MEDIA_URL + accessTokenFun.apply(appId) + "&type=" + mediaResource.getType();
-
-                JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(url, requestEntity, String.class));
-
-                if (isSuccess(jsonObject))
-                {
-                    mediaId = jsonObject.getString("media_id");
-
-                    //写入到缓存中
-                    mediaCacheRepository.save(key, new MediaCacheItem(mediaId));
-
-                    return mediaId;
-                }
-
-                throw new WxException(jsonObject.getInteger("errcode"), jsonObject.getString("errmsg"));
+                return mediaId;
 
             }
             catch (Exception e)
@@ -261,6 +273,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -276,12 +289,13 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun)
     {
 
-        return createPermanentQrCode(qrCode, accessTokenFun, DEFAULT_QRCODE_CACHE);
+        return createPermanentQrCode(qrCode, accessTokenFun, DEFAULT_QR_CODE_CACHE);
     }
 
 
@@ -291,6 +305,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
      * @param qrCodeCacheRepository CacheItem<QrCodeCacheItem>：自定义的缓存实现
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun,
@@ -308,6 +323,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -323,11 +339,12 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun)
     {
-        return createTemporaryQrCode(qrCode, accessTokenFun, DEFAULT_QRCODE_CACHE);
+        return createTemporaryQrCode(qrCode, accessTokenFun, DEFAULT_QR_CODE_CACHE);
     }
 
 
@@ -337,6 +354,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
      * @param qrCodeCacheRepository CacheItem<QrCodeCacheItem>：自定义的缓存实现
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun,
@@ -348,7 +366,70 @@ public final class WxResourceFetchUtil extends BaseUtil
     }
 
 
-    private static String doCreateQrCode(QrCodeRequest qrCodeRequest, Function<String, String> accessTokenFun,
+    /**
+     * 创建小程序二维码
+     *
+     * @param qrCodeParam MiniProgramQrCodeParam：小程序二维码创建的参数值
+     * @param accessToken String：微信服务器要求的accessToken
+     *
+     * @return 小程序二维码的字节数组
+     */
+    public static byte[] createMiniProgramQrCode(MiniProgramQrCodeParam qrCodeParam, String accessToken)
+    {
+
+        String requestUrl = MessageUrl.MINIPROGRAM_QRCODE_URL + accessToken;
+
+        HttpEntity<Object> requestEntity = new HttpEntity<>(qrCodeParam, DEFAULT_HEADER);
+
+        //小程序二维码特殊些，如果处理正确的话，返回的是byte数组
+        ResponseEntity<byte[]> responseEntity = REST_TEMPLATE.postForEntity(requestUrl, requestEntity, byte[].class);
+
+        if (responseEntity.getBody() == null)
+        {
+            throw new RuntimeException("小程序二维码生成失败");
+        }
+
+        String result = new String(responseEntity.getBody(), StandardCharsets.UTF_8);
+        //请求失败
+        if (result.contains("errcode"))
+        {
+            JSONObject jsonObject = JSON.parseObject(result);
+
+            LOGGER.error("小程序二维码生成失败，错误原因：" + jsonObject.getString("errmsg"));
+
+            throw new WxException(jsonObject.getInteger("errcode"), "小程序二维码生成失败" + jsonObject.getString("errmsg"));
+        }
+
+        return responseEntity.getBody();
+    }
+
+
+    /**
+     * 创建服务号菜单，该方法一般不常用
+     *
+     * @param menuButton MenuButton：服务号菜单数据
+     *
+     * @return 创建成功返回true，其他返回false
+     */
+    public static boolean createMenu(MenuButton menuButton)
+    {
+        try
+        {
+            HttpEntity<MenuButton> httpEntity = new HttpEntity<>(menuButton, DEFAULT_HEADER);
+            JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(menuButton.getUrl(), httpEntity, String.class));
+
+            return isSuccess(jsonObject);
+        }
+        catch (RestClientException e)
+        {
+            LOGGER.error("菜单创建失败", e);
+            return false;
+        }
+    }
+
+
+    private static String doCreateQrCode(QrCodeRequest qrCodeRequest,
+                                         Function<String, String> accessTokenFun,
                                          CacheItem<QrCodeCacheItem> cacheRepository)
     {
 
@@ -426,63 +507,49 @@ public final class WxResourceFetchUtil extends BaseUtil
     }
 
 
-    /**
-     * 创建小程序二维码
-     *
-     * @param qrCodeParam MiniProgramQrCodeParam：小程序二维码创建的参数值
-     * @param accessToken String：微信服务器要求的accessToken
-     * @return 小程序二维码的字节数组
-     */
-    public static byte[] createMiniProgramQrCode(MiniProgramQrCodeParam qrCodeParam, String accessToken)
+    private static String doUploadTemporaryMediaResource(MediaResourceRequest mediaResource, String accessToken) throws IOException
     {
+        String path = mediaResource.getResourceUrl().getPath();
 
-        String requestUrl = MessageUrl.MINIPROGRAM_QRCODE_URL + accessToken;
+        byte[] byteArray = IOUtils.toByteArray(new URL(path));
+        ContentBody contentBody = new ByteArrayBody(byteArray, FilenameUtils.getName(path));
 
-        HttpEntity<Object> requestEntity = new HttpEntity<>(qrCodeParam, DEFAULT_HEADER);
+        FormBodyPart bodyPartBuilder = FormBodyPartBuilder.create(contentBody.getFilename(), contentBody).build();
 
-        //小程序二维码特殊些，如果处理正确的话，返回的是byte数组
-        ResponseEntity<byte[]> responseEntity = REST_TEMPLATE.postForEntity(requestUrl, requestEntity, byte[].class);
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+        multipartEntityBuilder.addPart(bodyPartBuilder);
+        org.apache.http.HttpEntity requestEntity = multipartEntityBuilder.build();
 
-        if (responseEntity.getBody() == null)
+        String url = MessageUrl.UPLOAD_TEMP_MEDIA_URL + accessToken + "&type=" + mediaResource.getType();
+        HttpPost post = new HttpPost(url);
+        post.addHeader("Connection", "Keep-Alive");
+        post.addHeader("Cache-Control", "no-cache");
+        post.setEntity(requestEntity);
+
+        HttpClient client = HttpClients.createDefault();
+        HttpResponse httpResponse = client.execute(post);
+        int status = httpResponse.getStatusLine().getStatusCode();
+
+        if (status != HttpStatus.SC_OK)
         {
-            throw new RuntimeException("小程序二维码生成失败");
+            throw new RuntimeException("请求失败");
         }
 
-        String result = new String(responseEntity.getBody(), StandardCharsets.UTF_8);
-        //请求失败
-        if (result.contains("errcode"))
+        String result = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+
+        JSONObject jsonObject = JSON.parseObject(result);
+
+        if (jsonObject.containsKey("errcode"))
         {
-            JSONObject jsonObject = JSON.parseObject(result);
+            //请求失败
+            LOGGER.error("媒体资源上传失败，错误原因：" + jsonObject.getString("errmsg"));
 
-            LOGGER.error("小程序二维码生成失败，错误原因：" + jsonObject.getString("errmsg"));
-
-            throw new WxException(jsonObject.getInteger("errcode"), "小程序二维码生成失败" + jsonObject.getString("errmsg"));
+            throw new WxException(jsonObject.getInteger("errcode"), jsonObject.getString("errmsg"));
         }
 
-        return responseEntity.getBody();
-    }
+        LOGGER.info("媒体资源上传成功：{}", result);
 
-
-    /**
-     * 创建服务号菜单，该方法一般不常用
-     *
-     * @param menuButton MenuButton：服务号菜单数据
-     * @return 创建成功返回true，其他返回false
-     */
-    public static boolean createMenu(MenuButton menuButton)
-    {
-        try
-        {
-            HttpEntity<MenuButton> httpEntity = new HttpEntity<>(menuButton, DEFAULT_HEADER);
-            JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(menuButton.getUrl(), httpEntity, String.class));
-
-            return isSuccess(jsonObject);
-        }
-        catch (RestClientException e)
-        {
-            LOGGER.error("菜单创建失败", e);
-            return false;
-        }
+        return jsonObject.getString("media_id");
     }
 
 
