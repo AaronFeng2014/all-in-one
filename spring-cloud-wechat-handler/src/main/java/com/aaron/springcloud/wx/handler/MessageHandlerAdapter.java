@@ -1,5 +1,8 @@
 package com.aaron.springcloud.wx.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -12,7 +15,44 @@ import java.util.function.Consumer;
  * @description 一句话描述该文件的用途
  * @date 2018-11-09
  */
-public interface MessageHandlerAdapter extends Consumer<Map<String, String>>
+public abstract class MessageHandlerAdapter implements Consumer<Map<String, String>>
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandlerAdapter.class);
+
+
+    @Override
+    public final void accept(Map<String, String> params)
+    {
+        try
+        {
+            this.messageHandle(params);
+        }
+        catch (Exception e)
+        {
+            this.exceptionCaught(params, e);
+        }
+    }
+
+
+    /**
+     * 逻辑处理的地方，在该逻辑中用户可以不用关心异常处理
+     * <p>
+     * 异常会被传递到exceptionCaught方法中，用户可以在exceptionCaught方法中去做异常后的逻辑
+     *
+     * @param params Map<String, String>：微信回调参数
+     */
+    protected abstract void messageHandle(Map<String, String> params);
+
+
+    /**
+     * 异常处理的地方，比如可以给用户发一个错误的提示信息之类什么的
+     *
+     * @param params Map<String, String>：微信回调参数
+     * @param e Exception：messageHandle方法抛出的异常
+     */
+    protected void exceptionCaught(Map<String, String> params, Exception e)
+    {
+        LOGGER.warn("捕获到一条异常信息，异常message：{}", e.getMessage());
+    }
 }

@@ -31,7 +31,7 @@ public class MediaCacheItem
      *
      * @return 返回true表示已经过期了
      */
-    public boolean isExpired()
+    private boolean isExpired()
     {
         long between = ChronoUnit.HOURS.between(createTime, LocalDateTime.now());
 

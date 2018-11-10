@@ -1,6 +1,6 @@
 package com.aaron.springcloud.wx.cache.impl.memory;
 
-import com.aaron.springcloud.wx.cache.QrCodeCache;
+import com.aaron.springcloud.wx.cache.CacheItem;
 import com.aaron.springcloud.wx.domain.QrCodeCacheItem;
 import com.aaron.springcloud.wx.exception.ExpiredException;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @description 一句话描述该文件的用途
  * @date 2018/11/8
  */
-public class QrCodeMemoryCacheRepository implements QrCodeCache
+public class QrCodeMemoryCacheRepository  implements CacheItem<QrCodeCacheItem>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MediaMemoryCacheRepository.class);
 
@@ -44,24 +44,11 @@ public class QrCodeMemoryCacheRepository implements QrCodeCache
 
 
     @Override
-    public void saveQrCode(long hash, QrCodeCacheItem qrCodeCacheItem)
+    public String get(String key)
     {
-        try
-        {
-            LOGGER.info("已保存到缓存，QrCodeUrl：{}，key：{}", qrCodeCacheItem.getQrCodeUrl(), hash);
-            QRCODE_CACHE.put(hash, qrCodeCacheItem);
-        }
-        catch (ExpiredException e)
-        {
-            e.printStackTrace();
-        }
-    }
+        long hashCode = key.hashCode();
 
-
-    @Override
-    public String getQrCode(long hash)
-    {
-        QrCodeCacheItem qrCodeCacheItem = QRCODE_CACHE.get(hash);
+        QrCodeCacheItem qrCodeCacheItem = QRCODE_CACHE.get(hashCode);
 
         if (qrCodeCacheItem == null)
         {
@@ -77,11 +64,27 @@ public class QrCodeMemoryCacheRepository implements QrCodeCache
         catch (ExpiredException e)
         {
             //移除缓存
-            LOGGER.info("资源已过期，从缓存中移除，key：{}", hash);
+            LOGGER.info("资源已过期，从缓存中移除，key：{}", hashCode);
 
-            QRCODE_CACHE.remove(hash);
+            QRCODE_CACHE.remove(hashCode);
 
             return "";
+        }
+    }
+
+
+    @Override
+    public void save(String key, QrCodeCacheItem cacheItem)
+    {
+        try
+        {
+            long hashCode = key.hashCode();
+            LOGGER.info("已保存到缓存，QrCodeUrl：{}，key：{}", cacheItem.getQrCodeUrl(), hashCode);
+            QRCODE_CACHE.put(hashCode, cacheItem);
+        }
+        catch (ExpiredException e)
+        {
+            e.printStackTrace();
         }
     }
 }

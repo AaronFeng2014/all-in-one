@@ -41,7 +41,7 @@ public class MessageHandlerContext
      *
      * @param params String：微信的回调参数
      */
-    public void handleMessageChain(String params)
+    public void handleMessageChain(String params, String appId)
     {
         if (CollectionUtils.isEmpty(messageHandlerList))
         {
@@ -52,9 +52,6 @@ public class MessageHandlerContext
 
         //xml参数解析
         Map<String, String> formatParams = XmlUtils.parseToMap(params);
-
-        //服务号或小程序appId
-        String appId = formatParams.get("ToUserName");
 
         // 发送者openid
         String senderOpenId = formatParams.get("FromUserName");
@@ -74,7 +71,6 @@ public class MessageHandlerContext
         {
             LOGGER.warn("未找到对应的消息处理器，消息未被消费，请检查是否为appId为{}的小程序或者服务号配置了消息处理器", appId);
         }
-
     }
 
 

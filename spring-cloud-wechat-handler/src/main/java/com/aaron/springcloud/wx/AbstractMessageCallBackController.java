@@ -59,7 +59,6 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      *
      * @param appId String：小程序或者服务号对应的appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
-     *
      * @return 如果微信token认证成功，那么返回微信请求中携带的echoStr字符串
      */
     @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.GET)
@@ -83,7 +82,6 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      *
      * @param appId String：小程序或者服务号对应的appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
-     *
      * @return 直接返回 "success" 字符串
      */
     @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.POST)
@@ -91,7 +89,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     {
 
         //异步解析消息，并处理相关的逻辑
-        asyncDoHandle(request);
+        asyncDoHandle(appId, request);
 
         return SUCCESS;
     }
@@ -100,10 +98,11 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     /**
      * 异步，核心逻辑处理
      *
+     * @param appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
      */
     @Async
-    void asyncDoHandle(HttpServletRequest request)
+    void asyncDoHandle(String appId, HttpServletRequest request)
     {
         String originalParams;
         try
@@ -117,7 +116,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
             return;
         }
 
-        handlerContext.handleMessageChain(originalParams);
+        handlerContext.handleMessageChain(appId, originalParams);
     }
 
 
@@ -126,7 +125,6 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      *
      * @param appId String：小程序或者服务号的appId
      * @param request HttpServletRequest
-     *
      * @return 如果通过校验，则原样返回echoStr字符串，否则返回空字符串
      */
     private String checkConnection(String appId, HttpServletRequest request)

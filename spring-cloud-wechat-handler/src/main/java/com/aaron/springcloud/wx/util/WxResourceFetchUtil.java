@@ -1,11 +1,14 @@
 package com.aaron.springcloud.wx.util;
 
-import com.aaron.springcloud.wx.cache.MediaCache;
-import com.aaron.springcloud.wx.cache.QrCodeCache;
+import com.aaron.springcloud.wx.cache.CacheItem;
+import com.aaron.springcloud.wx.cache.impl.memory.AccessTokenCacheMemoryRepository;
 import com.aaron.springcloud.wx.cache.impl.memory.MediaMemoryCacheRepository;
 import com.aaron.springcloud.wx.cache.impl.memory.QrCodeMemoryCacheRepository;
+import com.aaron.springcloud.wx.config.AppConfig;
 import com.aaron.springcloud.wx.constants.MediaResourceTypeEnum;
 import com.aaron.springcloud.wx.constants.MessageUrl;
+import com.aaron.springcloud.wx.domain.AccessTokenCacheItem;
+import com.aaron.springcloud.wx.domain.MediaCacheItem;
 import com.aaron.springcloud.wx.domain.MediaResourceRequest;
 import com.aaron.springcloud.wx.domain.MiniProgramQrCodeParam;
 import com.aaron.springcloud.wx.domain.QrCode;
@@ -52,12 +55,17 @@ public final class WxResourceFetchUtil extends BaseUtil
     /**
      * 默认的媒体资源内存缓存实现
      */
-    private static final MediaCache DEFAULT_MEDIA_CACHE = new MediaMemoryCacheRepository();
+    private static final CacheItem<MediaCacheItem> DEFAULT_MEDIA_CACHE = new MediaMemoryCacheRepository();
 
     /**
      * 默认的二维码内存缓存实现
      */
-    private static final QrCodeCache DEFAULT_QRCODE_CACHE = new QrCodeMemoryCacheRepository();
+    private static final CacheItem<QrCodeCacheItem> DEFAULT_QRCODE_CACHE = new QrCodeMemoryCacheRepository();
+
+    /**
+     * 默认的accessToken内存缓存实现
+     */
+    private static final CacheItem<AccessTokenCacheItem> DEFAULT_ACCESS_TOKEN_CACHE = new AccessTokenCacheMemoryRepository();
 
 
     private WxResourceFetchUtil()
@@ -67,10 +75,77 @@ public final class WxResourceFetchUtil extends BaseUtil
 
 
     /**
+     * 获取小程序或者公众号对应的AccessToken，此token是微信接口调用的凭证
+     * <p>
+     * <p>
+     * <p>
+     * 默认使用内存缓存
+     *
+     * @param appConfig AppConfig：小程序或者公众号的配置信息
+     * @return 返回accesstoken
+     */
+    public static String getAccessToken(AppConfig appConfig)
+    {
+
+        return getAccessToken(appConfig, DEFAULT_ACCESS_TOKEN_CACHE);
+
+    }
+
+
+    /**
+     * 获取小程序或者公众号对应的AccessToken，此token是微信接口调用的凭证
+     * <p>
+     * <p>
+     * <p>
+     * 不适用缓存，每次从微信获取最新的数据
+     *
+     * @param appConfig AppConfig：小程序或者公众号的配置信息
+     * @return 返回accesstoken
+     */
+    public static String getAccessTokenWithoutCache(AppConfig appConfig)
+    {
+        return doGetAccessToken(appConfig).getAccessToken();
+    }
+
+
+    /**
+     * 获取小程序或者公众号对应的AccessToken，此token是微信接口调用的凭证
+     * <p>
+     * 该接口可以传入自定义的缓存实现
+     *
+     * @param appConfig AppConfig：小程序或者公众号的配置信息
+     * @param cacheRepository CacheItem<AccessTokenCacheItem>：自定义缓存实现
+     * @return 返回accesstoken
+     */
+    public static String getAccessToken(AppConfig appConfig, CacheItem<AccessTokenCacheItem> cacheRepository)
+    {
+
+        String accessToken = cacheRepository.get(appConfig.getAppId());
+        if (StringUtils.isNotEmpty(accessToken))
+        {
+            return accessToken;
+        }
+
+        synchronized (appConfig.getAppId())
+        {
+            accessToken = cacheRepository.get(appConfig.getAppId());
+            if (StringUtils.isNotEmpty(accessToken))
+            {
+
+                return accessToken;
+            }
+
+            AccessTokenCacheItem cacheItem = doGetAccessToken(appConfig);
+
+            return cacheItem.getAccessToken();
+        }
+    }
+
+
+    /**
      * 微信小程序和服务号客服消息发送
      *
      * @param costumerMessage CostumerMessage：待发送的客服消息
-     *
      * @return 发送成功时返回true，否则返回false
      */
     public static boolean sendCustomerMessage(CostumerMessage costumerMessage)
@@ -96,7 +171,6 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param mediaResource MediaResource：素材资源信息
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return
      */
     public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun)
@@ -110,16 +184,16 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param mediaResource MediaResource：素材资源信息
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
+     * @param mediaCacheRepository CacheItem<MediaCacheItem>： 自定义的缓存实现
      * @return 返回media_id
      */
     public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun,
-                                                      MediaCache mediaCacheRepository)
+                                                      CacheItem<MediaCacheItem> mediaCacheRepository)
     {
         //尝试优先从缓存中获取
         String key = mediaResource.getResourceUrl().getPath();
 
-        String mediaId = mediaCacheRepository.getMedia(key);
+        String mediaId = mediaCacheRepository.get(key);
 
         if (!StringUtils.isEmpty(mediaId))
         {
@@ -129,7 +203,7 @@ public final class WxResourceFetchUtil extends BaseUtil
         synchronized (mediaResource.getResourceUrl().getPath())
         {
 
-            mediaId = mediaCacheRepository.getMedia(key);
+            mediaId = mediaCacheRepository.get(key);
 
             if (!StringUtils.isEmpty(mediaId))
             {
@@ -165,7 +239,7 @@ public final class WxResourceFetchUtil extends BaseUtil
                     mediaId = jsonObject.getString("media_id");
 
                     //写入到缓存中
-                    mediaCacheRepository.saveMedia(key, mediaId);
+                    mediaCacheRepository.save(key, new MediaCacheItem(mediaId));
 
                     return mediaId;
                 }
@@ -187,7 +261,6 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -203,7 +276,6 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -218,11 +290,11 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     * @param qrCodeCacheRepository QrCodeCache：自定义的缓存实现
-     *
+     * @param qrCodeCacheRepository CacheItem<QrCodeCacheItem>：自定义的缓存实现
      * @return 可直接访问的二维码地址
      */
-    public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun, QrCodeCache qrCodeCacheRepository)
+    public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun,
+                                               CacheItem<QrCodeCacheItem> qrCodeCacheRepository)
     {
 
         QrCodeRequest qrCodeRequest = new QrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
@@ -236,7 +308,6 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -252,7 +323,6 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun)
@@ -266,11 +336,11 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     * @param qrCodeCacheRepository QrCodeCache：自定义的缓存实现
-     *
+     * @param qrCodeCacheRepository CacheItem<QrCodeCacheItem>：自定义的缓存实现
      * @return 可直接访问的二维码地址
      */
-    public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun, QrCodeCache qrCodeCacheRepository)
+    public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun,
+                                               CacheItem<QrCodeCacheItem> qrCodeCacheRepository)
     {
         TemporaryQrCodeRequest qrCodeRequest = new TemporaryQrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
 
@@ -278,12 +348,13 @@ public final class WxResourceFetchUtil extends BaseUtil
     }
 
 
-    private static String doCreateQrCode(QrCodeRequest qrCodeRequest, Function<String, String> accessTokenFun, QrCodeCache cacheRepository)
+    private static String doCreateQrCode(QrCodeRequest qrCodeRequest, Function<String, String> accessTokenFun,
+                                         CacheItem<QrCodeCacheItem> cacheRepository)
     {
 
-        long sceneStrHash = qrCodeRequest.getActionInfo().getScene().getSceneStr().hashCode();
+        String sceneStr = qrCodeRequest.getActionInfo().getScene().getSceneStr();
 
-        String qrCodeUrl = cacheRepository.getQrCode(sceneStrHash);
+        String qrCodeUrl = cacheRepository.get(sceneStr);
 
         if (StringUtils.isNotEmpty(qrCodeUrl))
         {
@@ -292,7 +363,7 @@ public final class WxResourceFetchUtil extends BaseUtil
 
         synchronized (qrCodeRequest.getActionInfo().getScene().getSceneStr())
         {
-            qrCodeUrl = cacheRepository.getQrCode(sceneStrHash);
+            qrCodeUrl = cacheRepository.get(sceneStr);
             if (StringUtils.isNotEmpty(qrCodeUrl))
             {
                 return qrCodeUrl;
@@ -335,12 +406,33 @@ public final class WxResourceFetchUtil extends BaseUtil
     }
 
 
+    private static AccessTokenCacheItem doGetAccessToken(AppConfig appConfig)
+    {
+        String accessToken;
+        String url = MessageUrl.ACCESSTOKEN_URL.replaceFirst("\\{}", appConfig.getAppId()).replaceFirst("", appConfig.getAppSecret());
+
+        JSONObject jsonObject = extractResponse(REST_TEMPLATE.getForEntity(url, String.class));
+
+        if (isSuccess(jsonObject))
+        {
+            //expires_in
+            accessToken = jsonObject.getString("access_token");
+            int expiresIn = jsonObject.getIntValue("expires_in");
+
+            AccessTokenCacheItem cacheItem = new AccessTokenCacheItem(accessToken, expiresIn);
+
+            return cacheItem;
+        }
+
+        throw new RuntimeException("accessToken获取失败");
+    }
+
+
     /**
      * 创建小程序二维码
      *
      * @param qrCodeParam MiniProgramQrCodeParam：小程序二维码创建的参数值
      * @param accessToken String：微信服务器要求的accessToken
-     *
      * @return 小程序二维码的字节数组
      */
     public static byte[] createMiniProgramQrCode(MiniProgramQrCodeParam qrCodeParam, String accessToken)
@@ -374,10 +466,9 @@ public final class WxResourceFetchUtil extends BaseUtil
 
 
     /**
-     * 创建服务号菜单
+     * 创建服务号菜单，该方法一般不常用
      *
      * @param menuButton MenuButton：服务号菜单数据
-     *
      * @return 创建成功返回true，其他返回false
      */
     public static boolean createMenu(MenuButton menuButton)
@@ -397,7 +488,7 @@ public final class WxResourceFetchUtil extends BaseUtil
     }
 
 
-    private static String saveToCache(QrCodeRequest qrCodeRequest, String qrCodeUrl, QrCodeCache qrCodeCacheRepository)
+    private static String saveToCache(QrCodeRequest qrCodeRequest, String qrCodeUrl, CacheItem<QrCodeCacheItem> qrCodeCacheRepository)
     {
         QrCodeCacheItem cacheItem;
 
@@ -410,9 +501,9 @@ public final class WxResourceFetchUtil extends BaseUtil
             cacheItem = new QrCodeCacheItem(qrCodeUrl);
         }
 
-        long sceneStrHash = qrCodeRequest.getActionInfo().getScene().getSceneStr().hashCode();
+        String sceneStr = qrCodeRequest.getActionInfo().getScene().getSceneStr();
 
-        qrCodeCacheRepository.saveQrCode(sceneStrHash, cacheItem);
+        qrCodeCacheRepository.save(sceneStr, cacheItem);
 
         return qrCodeUrl;
     }

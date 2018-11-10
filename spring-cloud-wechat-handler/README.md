@@ -67,7 +67,8 @@
             
 5. 自定义功能逻辑实现
 
-       在自定义的逻辑处理器中需要用户自行实现MessageHandlerAdapter接口，并实现accpt方法，在该方法中实现业务逻辑，
+       在自定义的逻辑处理器中需要用户自行实现MessageHandlerAdapter接口，并实现messageHandle方法，在该方法中实现业务逻辑，该方法用户可以不用关注异常处理
+       如果异常时，有特殊的逻辑，可以实现exceptionCaught方法，并在此方法中完成异常逻辑
        
        For example：
        
@@ -75,9 +76,16 @@
        {
        
            @Override
-           public void accept(Map<String, String> params)
+           public void messageHandle(Map<String, String> params)
            {
                System.out.println("在这里实现你的业务");
+           }
+           
+           
+           @Override
+           public void exceptionCaught(Map<String, String> params， Exception e)
+           {
+               System.out.println("在这里实现你的异常逻辑");
            }
        }
        

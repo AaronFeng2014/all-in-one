@@ -20,6 +20,8 @@ public class AppConfig
 
     private String token;
 
+    private String appSecret;
+
     private String encodingAesKey;
 
 

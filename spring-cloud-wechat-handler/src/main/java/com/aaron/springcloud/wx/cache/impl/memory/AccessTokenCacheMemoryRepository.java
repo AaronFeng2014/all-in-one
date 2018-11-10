@@ -1,7 +1,7 @@
 package com.aaron.springcloud.wx.cache.impl.memory;
 
 import com.aaron.springcloud.wx.cache.CacheItem;
-import com.aaron.springcloud.wx.domain.MediaCacheItem;
+import com.aaron.springcloud.wx.domain.AccessTokenCacheItem;
 import com.aaron.springcloud.wx.exception.ExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,15 +10,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 媒体资源内存缓存
+ * AccessToken 内存缓存实现
  *
  * @author FengHaixin
  * @description 一句话描述该文件的用途
- * @date 2018/11/8
+ * @date 2018-11-10
  */
-public final class MediaMemoryCacheRepository implements CacheItem<MediaCacheItem>
+public class AccessTokenCacheMemoryRepository implements CacheItem<AccessTokenCacheItem>
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MediaMemoryCacheRepository.class);
 
     private static final int MAX_CACHE_SIZE = 1000;
@@ -26,11 +25,11 @@ public final class MediaMemoryCacheRepository implements CacheItem<MediaCacheIte
     /**
      * 临时素材缓存
      */
-    private static final Map<String, MediaCacheItem> MEDIA_CACHE = new LinkedHashMap<String, MediaCacheItem>()
+    private static final Map<String, AccessTokenCacheItem> ACCESS_TOKEN_CACHE = new LinkedHashMap<String, AccessTokenCacheItem>()
     {
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<String, MediaCacheItem> eldest)
+        protected boolean removeEldestEntry(Map.Entry<String, AccessTokenCacheItem> eldest)
         {
             boolean overFlow = this.size() > MAX_CACHE_SIZE;
 
@@ -45,17 +44,17 @@ public final class MediaMemoryCacheRepository implements CacheItem<MediaCacheIte
 
 
     @Override
-    public String get(String mediaIndex)
+    public String get(String appId)
     {
-        MediaCacheItem cacheMedia = MEDIA_CACHE.get(mediaIndex);
+        AccessTokenCacheItem cacheItem = ACCESS_TOKEN_CACHE.get(appId);
 
-        if (cacheMedia == null)
+        if (cacheItem == null)
         {
             return null;
         }
         try
         {
-            String mediaId = cacheMedia.getMediaId();
+            String mediaId = cacheItem.getAccessToken();
 
             LOGGER.info("从缓存中加载到资源，media_id：{}", mediaId);
 
@@ -63,9 +62,9 @@ public final class MediaMemoryCacheRepository implements CacheItem<MediaCacheIte
         }
         catch (ExpiredException e)
         {
-            LOGGER.info("资源已过期，从缓存中移除，key：{}", mediaIndex);
+            LOGGER.info("资源已过期，从缓存中移除，key：{}", appId);
 
-            MEDIA_CACHE.remove(mediaIndex);
+            ACCESS_TOKEN_CACHE.remove(appId);
 
             return null;
         }
@@ -73,11 +72,10 @@ public final class MediaMemoryCacheRepository implements CacheItem<MediaCacheIte
 
 
     @Override
-    public void save(String key, MediaCacheItem cacheItem)
+    public void save(String appId, AccessTokenCacheItem cacheItem)
     {
-        MEDIA_CACHE.put(key, cacheItem);
+        ACCESS_TOKEN_CACHE.put(appId, cacheItem);
 
-        LOGGER.info("已保存到缓存，mediaId：{}，key：{}", cacheItem.getMediaId(), key);
+        LOGGER.info("已保存到缓存，mediaId：{}，key：{}", cacheItem.getAccessToken(), appId);
     }
-
 }

@@ -14,7 +14,7 @@ public interface MessageUrl
     /**
      * 接口调用凭证获取地址
      */
-    String ACCESSTOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential";
+    String ACCESSTOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}";
 
     String SERVERIP_URL = "https://api.weixin.qq.com/cgi-bin/getcallbackip";
 

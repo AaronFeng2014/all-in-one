@@ -1,6 +1,7 @@
 package com.aaron.springcloud.wx.handler;
 
 import com.aaron.springcloud.wx.register.WxCallBackTypeEnum;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +28,19 @@ public class MessageHandlerAdapterContext
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4);
 
-    private static final MessageHandlerAdapter DEFAULT_HANDLER_ADAPTER = params -> {
+    private static final MessageHandlerAdapter DEFAULT_HANDLER_ADAPTER = new MessageHandlerAdapter()
+    {
+        @Override
+        protected void messageHandle(Map<String, String> params)
+        {
+            //获取事件类型, 微信回调中事件类型和消息类型的区分,两者是不同的字段
+            String type = params.getOrDefault("Event", params.getOrDefault("MsgType", ""));
 
-        //获取事件类型, 微信回调中事件类型和消息类型的区分,两者是不同的字段
-        String type = params.getOrDefault("Event", params.getOrDefault("MsgType", ""));
-
-        LOGGER.warn("未注册相应的事件处理器，事件类型：{}", type);
+            LOGGER.warn("未注册相应的事件处理器，事件类型：{}", type);
+        }
     };
+
+    private static final List<MessageHandlerAdapter> SINGLE_DEFAULT_HANDLER_ADAPTER = ImmutableList.of(DEFAULT_HANDLER_ADAPTER);
 
     /**
      * 消息处理适配器
@@ -75,20 +82,10 @@ public class MessageHandlerAdapterContext
         String type = params.getOrDefault("Event", params.getOrDefault("MsgType", ""));
 
         //查找事件注册的处理器adapter
-        messageHandlerAdapters.getOrDefault(type, Collections.singletonList(DEFAULT_HANDLER_ADAPTER)).forEach(consumer -> {
+        messageHandlerAdapters.getOrDefault(type, SINGLE_DEFAULT_HANDLER_ADAPTER).forEach(consumer -> {
 
             //线程池异步执行
-            EXECUTOR_SERVICE.execute(() -> {
-                try
-                {
-                    consumer.accept(params);
-
-                }
-                catch (Exception e)
-                {
-                    LOGGER.error("事件处理错误，事件类型：{}", type, e);
-                }
-            });
+            EXECUTOR_SERVICE.execute(() -> consumer.accept(params));
 
         });
 
@@ -99,7 +96,7 @@ public class MessageHandlerAdapterContext
      * 注册事件处理器，在接收到微信的回调后，只会关心已经注册过的事件，同一个事件可以注册多个处理器
      *
      * @param callBack MessageAdapterTypeEnum： 参考{@link com.aaron.springcloud.wx.register.WxCallBackTypeEnum}中定义的枚举值，该参数表示用户关心的微信回调事件
-     * @param consumers Consumer<MessageHandlerAdapter>：对应事件的处理器
+     * @param consumers Consumer<Map<String, Object>>：对应事件的处理器
      */
     public MessageHandlerAdapterContext addMessageHandlerAdapter(WxCallBackTypeEnum callBack, MessageHandlerAdapter... consumers)
     {
