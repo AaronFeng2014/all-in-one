@@ -98,7 +98,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     /**
      * 异步，核心逻辑处理
      *
-     * @param appId
+     * @param appId String：消息所属的appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
      */
     @Async

@@ -1,8 +1,5 @@
 package com.aaron.springcloud.wx.handler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -17,9 +14,6 @@ import java.util.function.Consumer;
  */
 public abstract class MessageHandlerAdapter implements Consumer<Map<String, String>>
 {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandlerAdapter.class);
-
 
     @Override
     public final void accept(Map<String, String> params)

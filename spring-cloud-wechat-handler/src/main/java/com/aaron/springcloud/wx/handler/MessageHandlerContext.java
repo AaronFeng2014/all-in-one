@@ -40,6 +40,7 @@ public class MessageHandlerContext
      * 微信事件回调消息处理入口
      *
      * @param params String：微信的回调参数
+     * @param appId String：消息所属的appId
      */
     public void handleMessageChain(String params, String appId)
     {

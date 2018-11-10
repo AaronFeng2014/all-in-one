@@ -130,15 +130,16 @@ public final class WxResourceFetchUtil extends BaseUtil
     public static String getAccessToken(AppConfig appConfig, CacheItem<AccessTokenCacheItem> cacheRepository)
     {
 
-        String accessToken = cacheRepository.get(appConfig.getAppId());
+        String appId = appConfig.getAppId();
+        String accessToken = cacheRepository.get(appId);
         if (StringUtils.isNotEmpty(accessToken))
         {
             return accessToken;
         }
 
-        synchronized (appConfig.getAppId())
+        synchronized (appId.intern())
         {
-            accessToken = cacheRepository.get(appConfig.getAppId());
+            accessToken = cacheRepository.get(appId);
             if (StringUtils.isNotEmpty(accessToken))
             {
 
@@ -148,7 +149,7 @@ public final class WxResourceFetchUtil extends BaseUtil
             AccessTokenCacheItem cacheItem = doGetAccessToken(appConfig);
 
             //保存缓存
-            cacheRepository.save(appConfig.getAppId(), cacheItem);
+            cacheRepository.save(appId, cacheItem);
 
             return cacheItem.getAccessToken();
         }
@@ -237,7 +238,7 @@ public final class WxResourceFetchUtil extends BaseUtil
             return mediaId;
         }
 
-        synchronized (mediaResource.getResourceUrl().getPath())
+        synchronized (key.intern())
         {
 
             mediaId = mediaCacheRepository.get(key);
@@ -272,15 +273,14 @@ public final class WxResourceFetchUtil extends BaseUtil
      * 创建永久的服务号二维码
      *
      * @param qrCode QrCode：二维码请求
-     * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
+     * @param accessToken String： accessToken
      * @return 可直接访问的二维码地址
      */
-    public static String createPermanentQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
+    public static String createPermanentQrCodeWithOutCache(QrCode qrCode, String accessToken)
     {
         QrCodeRequest qrCodeRequest = new QrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
 
-        return doCreateQrCodeWithoutCache(qrCodeRequest, accessTokenFun);
+        return doCreateQrCodeWithoutCache(qrCodeRequest, accessToken);
     }
 
 
@@ -322,15 +322,14 @@ public final class WxResourceFetchUtil extends BaseUtil
      * 创建临时的服务号二维码，不使用缓存
      *
      * @param qrCode QrCode：二维码请求
-     * @param accessTokenFun Function<String, String>： 延迟计算获取accessToken的函数式方法
-     *
+     * @param accessToken String： accessToken
      * @return 可直接访问的二维码地址
      */
-    public static String createTemporaryQrCodeWithOutCache(QrCode qrCode, Function<String, String> accessTokenFun)
+    public static String createTemporaryQrCodeWithOutCache(QrCode qrCode, String accessToken)
     {
         TemporaryQrCodeRequest qrCodeRequest = new TemporaryQrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
 
-        return doCreateQrCodeWithoutCache(qrCodeRequest, accessTokenFun);
+        return doCreateQrCodeWithoutCache(qrCodeRequest, accessToken);
     }
 
 
@@ -442,7 +441,7 @@ public final class WxResourceFetchUtil extends BaseUtil
             return qrCodeUrl;
         }
 
-        synchronized (qrCodeRequest.getActionInfo().getScene().getSceneStr())
+        synchronized (sceneStr.intern())
         {
             qrCodeUrl = cacheRepository.get(sceneStr);
             if (StringUtils.isNotEmpty(qrCodeUrl))
@@ -451,7 +450,8 @@ public final class WxResourceFetchUtil extends BaseUtil
             }
             else
             {
-                String url = doCreateQrCodeWithoutCache(qrCodeRequest, accessTokenFun);
+                String accessToken = accessTokenFun.apply(qrCodeRequest.getAppId());
+                String url = doCreateQrCodeWithoutCache(qrCodeRequest, accessToken);
 
                 saveToCache(qrCodeRequest, url, cacheRepository);
 
@@ -462,9 +462,9 @@ public final class WxResourceFetchUtil extends BaseUtil
     }
 
 
-    private static String doCreateQrCodeWithoutCache(QrCodeRequest qrCodeRequest, Function<String, String> accessTokenFun)
+    private static String doCreateQrCodeWithoutCache(QrCodeRequest qrCodeRequest, String accessToken)
     {
-        String requestUrl = MessageUrl.CREATE_QRCODE_TICKET_URL + accessTokenFun.apply(qrCodeRequest.getAppId());
+        String requestUrl = MessageUrl.CREATE_QRCODE_TICKET_URL + accessToken;
 
         HttpEntity<QrCodeRequest> httpEntity = new HttpEntity<>(qrCodeRequest, DEFAULT_HEADER);
 
