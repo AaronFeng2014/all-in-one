@@ -419,9 +419,7 @@ public final class WxResourceFetchUtil extends BaseUtil
             accessToken = jsonObject.getString("access_token");
             int expiresIn = jsonObject.getIntValue("expires_in");
 
-            AccessTokenCacheItem cacheItem = new AccessTokenCacheItem(accessToken, expiresIn);
-
-            return cacheItem;
+            return new AccessTokenCacheItem(accessToken, expiresIn);
         }
 
         throw new RuntimeException("accessToken获取失败");

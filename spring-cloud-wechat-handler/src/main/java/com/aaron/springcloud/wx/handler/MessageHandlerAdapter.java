@@ -46,13 +46,22 @@ public abstract class MessageHandlerAdapter implements Consumer<Map<String, Stri
 
 
     /**
-     * 异常处理的地方，比如可以给用户发一个错误的提示信息之类什么的
+     * 异常处理的地方，比如可以给用户发一个错误的提示信息之类什么的，默认处理异常的方式是直接抛出
+     * <p>
+     * 特殊逻辑需开发者自己实现
      *
      * @param params Map<String, String>：微信回调参数
      * @param e Exception：messageHandle方法抛出的异常
      */
     protected void exceptionCaught(Map<String, String> params, Exception e)
     {
-        LOGGER.warn("捕获到一条异常信息，异常message：{}", e.getMessage());
+        try
+        {
+            throw e;
+        }
+        catch (Exception ignore)
+        {
+
+        }
     }
 }
