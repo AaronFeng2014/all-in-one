@@ -62,23 +62,18 @@ public class MiniProgramEncryptedDataDecoder
     }
 
 
-    private static byte[] decrypt(byte[] content, byte[] keyByte, byte[] ivByte)
+    private static byte[] decrypt(byte[] content, byte[] keyByte, byte[] ivByte) throws Exception
     {
-        try
-        {
-            Security.addProvider(new BouncyCastleProvider());
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
 
-            Key sKeySpec = new SecretKeySpec(keyByte, "AES");
+        Security.addProvider(new BouncyCastleProvider());
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
 
-            cipher.init(Cipher.DECRYPT_MODE, sKeySpec, generateIv(ivByte));
+        Key sKeySpec = new SecretKeySpec(keyByte, "AES");
 
-            return cipher.doFinal(content);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("解密数据错误", e);
-        }
+        cipher.init(Cipher.DECRYPT_MODE, sKeySpec, generateIv(ivByte));
+
+        return cipher.doFinal(content);
+
     }
 
 
