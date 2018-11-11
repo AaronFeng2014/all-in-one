@@ -3,6 +3,9 @@ package com.aaron.springcloud.wx.message;
 import com.aaron.springcloud.wx.constants.MessageTypeEnums;
 import com.aaron.springcloud.wx.constants.MessageUrl;
 import com.aaron.springcloud.wx.message.msgbody.Image;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 在客服消息中给用户发送图片消息
@@ -13,6 +16,9 @@ import com.aaron.springcloud.wx.message.msgbody.Image;
  * @description 一句话描述该文件的用途
  * @date 2018/11/7
  */
+@Setter
+@Getter
+@ToString (callSuper = true)
 public class ImageMessage extends CostumerMessage
 {
     private Image image;

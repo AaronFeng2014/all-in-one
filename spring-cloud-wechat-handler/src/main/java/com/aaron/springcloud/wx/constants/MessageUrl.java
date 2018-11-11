@@ -76,7 +76,10 @@ public interface MessageUrl
 
     String DELETETEMPLATEURL = "https://api.weixin.qq.com/cgi-bin/template/del_private_template";
 
-    String SENDTEMPLATEURL = "https://api.weixin.qq.com/cgi-bin/message/template/send";
+    /**
+     * 发送模板消息地址
+     */
+    String SEND_TEMPLATE_MESSAGE_URL = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=";
 
     String AUTOREPLYURL = "https://api.weixin.qq.com/cgi-bin/get_current_autoreply_info";
 

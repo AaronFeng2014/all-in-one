@@ -3,6 +3,7 @@ package com.aaron.springcloud.wx.message.msgbody;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author FengHaixin
@@ -11,6 +12,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@ToString
 public class Music
 {
 

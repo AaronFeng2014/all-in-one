@@ -2,6 +2,7 @@ package com.aaron.springcloud.wx.message.msgbody;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author FengHaixin
@@ -10,14 +11,12 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@ToString
 public class MiniProgram
 {
-
-    private String title;
 
     private String appid;
 
     private String pagepath;
 
-    private String thumb_media_id;
 }

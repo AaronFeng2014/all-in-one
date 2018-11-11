@@ -2,7 +2,7 @@ package com.aaron.springcloud.wx.message;
 
 import com.aaron.springcloud.wx.constants.MessageTypeEnums;
 import com.aaron.springcloud.wx.constants.MessageUrl;
-import com.aaron.springcloud.wx.message.msgbody.MiniProgram;
+import com.aaron.springcloud.wx.message.msgbody.MiniProgramCard;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,13 +21,13 @@ import lombok.ToString;
 public class MiniProgramMessage extends CostumerMessage
 {
     @JSONField (name = "miniprogrampage")
-    private MiniProgram miniProgramPage;
+    private MiniProgramCard miniProgramPage;
 
 
-    public MiniProgramMessage(MiniProgram miniProgramPage, String accessToken)
+    public MiniProgramMessage(MiniProgramCard miniProgram, String accessToken)
     {
         super(MessageTypeEnums.MINI_PROGRAM.getType(), MessageUrl.COSTUMER_MESSAGE_URL + accessToken);
 
-        this.miniProgramPage = miniProgramPage;
+        this.miniProgramPage = miniProgram;
     }
 }

@@ -17,6 +17,7 @@ import com.aaron.springcloud.wx.domain.TemporaryQrCodeRequest;
 import com.aaron.springcloud.wx.exception.WxException;
 import com.aaron.springcloud.wx.menu.MenuButton;
 import com.aaron.springcloud.wx.message.CostumerMessage;
+import com.aaron.springcloud.wx.message.TemplateMessage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import java.io.IOException;
@@ -154,6 +155,33 @@ public final class WxResourceFetchUtil extends BaseUtil
 
 
     /**
+     * 模板消息发送接口
+     *
+     * @param message TemplateMessage：要发送的模板消息内容
+     * @param accessToken String：接口调用凭证accessToken
+     *
+     * @return 发送成功时返回true，否则返回false
+     */
+    public static boolean sendTemplateMessage(TemplateMessage message, String accessToken)
+    {
+
+        try
+        {
+            HttpEntity<TemplateMessage> requestEntity = new HttpEntity<>(message);
+            String url = MessageUrl.SEND_TEMPLATE_MESSAGE_URL + accessToken;
+            JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(url, requestEntity, String.class));
+
+            return isSuccess(jsonObject);
+        }
+        catch (RestClientException e)
+        {
+            LOGGER.error("发送模板消息异常", e);
+            return false;
+        }
+    }
+
+
+    /**
      * 微信小程序和服务号客服消息发送
      *
      * @param costumerMessage CostumerMessage：待发送的客服消息
@@ -271,6 +299,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessToken String： accessToken
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createPermanentQrCodeWithOutCache(QrCode qrCode, String accessToken)
@@ -320,6 +349,7 @@ public final class WxResourceFetchUtil extends BaseUtil
      *
      * @param qrCode QrCode：二维码请求
      * @param accessToken String： accessToken
+     *
      * @return 可直接访问的二维码地址
      */
     public static String createTemporaryQrCodeWithOutCache(QrCode qrCode, String accessToken)
