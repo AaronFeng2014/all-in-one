@@ -5,8 +5,6 @@ import com.aaron.springcloud.wx.domain.MediaResourceRequest;
 import com.aaron.springcloud.wx.domain.QrCode;
 import com.aaron.springcloud.wx.menu.MenuButton;
 import com.google.common.collect.ImmutableList;
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -45,14 +43,25 @@ public class WxResourceFetchUtilTest
 
 
     @Test
-    public void uploadTemporaryMediaResource() throws MalformedURLException
+    public void uploadTemporaryMediaResource() throws Exception
     {
         String wxGroupUrl = "http://fdfs.test.ximalaya.com/group1/M00/4D/39/wKgDplvOxoWAL562AACUsZTVKXE621.jpg";
-        MediaResourceRequest resource = new MediaResourceRequest(MediaResourceTypeEnum.IMAGE, new URL(wxGroupUrl), "");
+        MediaResourceRequest resource = new MediaResourceRequest(MediaResourceTypeEnum.IMAGE, wxGroupUrl, "");
 
-        String accessToken = "15_OP0OHMtWoc7Tr8DGbeFxaFLtj_iCucRE_mvlwKlk2qfr2jQm4eZxiKGL1yEuLLUm31FNBSDa6HxBnG7oFlFNnIrsILL5fNvMVo5L8CjLlzc_Y9k4rdX6avf4SiwFr5_NKXlyyX3b7Pua3lBsLXUdAAABNK";
+        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
+        Function<String, String> tokenFun = p -> localToken;
 
-        WxResourceFetchUtil.uploadTemporaryMediaResource(resource, obj -> accessToken);
+        for (int i = 0; i < 20; i++)
+        {
+
+            new Thread(() -> {
+
+                WxResourceUtil.uploadTemporaryMediaResource(resource, tokenFun);
+
+            }).start();
+
+        }
+        TimeUnit.MINUTES.sleep(5);
     }
 
 
@@ -91,17 +100,22 @@ public class WxResourceFetchUtilTest
     {
         QrCode qrCode = new QrCode("test-appId-unless", "test-scene");
 
-        String localToken = "";
+        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
         Function<String, String> tokenFun = p -> localToken;
 
         for (int i = 0; i < 20; i++)
         {
-            String url = WxResourceFetchUtil.createTemporaryQrCode(qrCode, tokenFun);
 
-            System.out.println("获取到的二维码地址是：" + url);
+            new Thread(() -> {
 
-            TimeUnit.SECONDS.sleep(5);
+                String url = WxResourceUtil.createTemporaryQrCode(qrCode, tokenFun);
+
+                System.out.println("获取到的二维码地址是：" + url);
+
+            }).start();
+
         }
+        TimeUnit.MINUTES.sleep(5);
 
     }
 
@@ -146,6 +160,6 @@ public class WxResourceFetchUtilTest
 
         menuButton.setButtons(firstMenu);
 
-        System.out.println("菜单创建结果" + WxResourceFetchUtil.createMenu(menuButton));
+        System.out.println("菜单创建结果" + WxResourceUtil.createMenu(menuButton));
     }
 }

@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 class BaseUtil
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WxResourceFetchUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseUtil.class);
 
     static final RestTemplate REST_TEMPLATE;
 

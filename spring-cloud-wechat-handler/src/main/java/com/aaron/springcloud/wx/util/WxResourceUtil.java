@@ -53,9 +53,9 @@ import java.util.function.Function;
  * @description 一句话描述该文件的用途
  * @date 2018-11-07
  */
-public final class WxResourceFetchUtil extends BaseUtil
+public final class WxResourceUtil extends BaseUtil
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WxResourceFetchUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxResourceUtil.class);
 
     /**
      * 默认的媒体资源内存缓存实现
@@ -73,7 +73,7 @@ public final class WxResourceFetchUtil extends BaseUtil
     private static final CacheItem<AccessTokenCacheItem> DEFAULT_ACCESS_TOKEN_CACHE = new AccessTokenCacheMemoryRepository();
 
 
-    private WxResourceFetchUtil()
+    private WxResourceUtil()
     {
 
     }
