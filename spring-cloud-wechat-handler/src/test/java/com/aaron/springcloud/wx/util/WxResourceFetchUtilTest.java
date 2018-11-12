@@ -4,10 +4,10 @@ import com.aaron.springcloud.wx.constants.MediaResourceTypeEnum;
 import com.aaron.springcloud.wx.domain.MediaResourceRequest;
 import com.aaron.springcloud.wx.domain.QrCode;
 import com.aaron.springcloud.wx.menu.MenuButton;
+import com.aaron.springcloud.wx.message.ImageMessage;
 import com.aaron.springcloud.wx.message.TemplateMessage;
-import com.aaron.springcloud.wx.message.TextMessage;
+import com.aaron.springcloud.wx.message.msgbody.Image;
 import com.aaron.springcloud.wx.message.msgbody.TemplateItem;
-import com.aaron.springcloud.wx.message.msgbody.Text;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
@@ -47,7 +47,9 @@ public class WxResourceFetchUtilTest
     public void sendCustomerMessage()
     {
 
-        TextMessage message = new TextMessage(new Text("test"), localToken);
+        String mediaId = "r2vIYEwkhHk7_qNyqWNKG6orJnw5uET112QCmVM4x82jxP8UUWh9dRjcnwsn496U";
+        ImageMessage message = new ImageMessage(new Image(mediaId), localToken);
+
         message.setTouser("oDA9esyHfeUQTPBYvxTykFlccHu0");
         WxResourceUtil.sendCustomerMessage(message);
     }

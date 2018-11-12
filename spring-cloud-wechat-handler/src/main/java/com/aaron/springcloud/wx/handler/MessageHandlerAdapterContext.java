@@ -2,6 +2,7 @@ package com.aaron.springcloud.wx.handler;
 
 import com.aaron.springcloud.wx.register.WxCallBackTypeEnum;
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class MessageHandlerAdapterContext
      */
     private Map<String, List<MessageHandlerAdapter>> messageHandlerAdapters = new HashMap<>();
 
+    @Getter
     private String appId;
 
 
@@ -127,6 +129,8 @@ public class MessageHandlerAdapterContext
         {
             Collections.addAll(consumerList, consumers);
         }
+
+        LOGGER.info("已注册公众号或者小程序回调事件，appId：{},事件类型：{}", this.appId, callBack.getType());
 
         return this;
     }

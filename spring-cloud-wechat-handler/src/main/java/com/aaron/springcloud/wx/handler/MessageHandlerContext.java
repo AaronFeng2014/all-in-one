@@ -81,6 +81,8 @@ public class MessageHandlerContext
 
         messageHandlerList.add(messageHandler);
 
+        LOGGER.info("已注册公众号或小程序事件处理器，appId：{}", messageHandler.getAppId());
+
         return this;
     }
 
@@ -97,6 +99,7 @@ public class MessageHandlerContext
          * 解析XML为Document对象
          *
          * @param xml 被解析的XMl
+         *
          * @return Document
          */
         private static Map<String, String> parseXml(String xml)
