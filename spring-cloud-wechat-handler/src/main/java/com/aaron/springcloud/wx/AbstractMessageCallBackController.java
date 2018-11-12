@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -63,7 +62,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      * @return 如果微信token认证成功，那么返回微信请求中携带的echoStr字符串
      */
     @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.GET)
-    public String wxConnection(@PathVariable ("appId") String appId, HttpServletRequest request)
+    public final String wxConnection(@PathVariable ("appId") String appId, HttpServletRequest request)
     {
 
         String echoStr = checkConnection(appId, request);
@@ -87,7 +86,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      * @return 直接返回 "success" 字符串
      */
     @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.POST)
-    public String messageCallBackHandle(@PathVariable ("appId") String appId, HttpServletRequest request)
+    public final String messageCallBackHandle(@PathVariable ("appId") String appId, HttpServletRequest request)
     {
 
         //异步解析消息，并处理相关的逻辑
@@ -98,13 +97,12 @@ public abstract class AbstractMessageCallBackController implements InitializingB
 
 
     /**
-     * 异步，核心逻辑处理
+     * 匹配到具体handlerAdapter后，内部使用异步处理，核心逻辑处理
      *
      * @param appId String：消息所属的appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
      */
-    @Async
-    void asyncDoHandle(String appId, HttpServletRequest request)
+    final void asyncDoHandle(String appId, HttpServletRequest request)
     {
         String originalParams;
         try
