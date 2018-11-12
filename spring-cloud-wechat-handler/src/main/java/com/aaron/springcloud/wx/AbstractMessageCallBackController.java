@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * 微信消息回调事件处理器，该类是一个抽象类，需要用户实现该类，并实现该类中唯一需要实现的方法afterPropertiesSet {@link org.springframework.beans.factory.InitializingBean}
+ * 微信消息回调事件处理器，该类是一个抽象类，需要用户实现该类，并实现该类中唯一需要实现的方法registerHandler
  * <p>
  * 实现该方法的目的是向handlerContext中注册不同的小程序或者服务号的MessageHandlerAdapterContext
  * <p>
@@ -51,7 +51,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     @Autowired
     private AppConfigurations appConfigurations;
 
-    protected MessageHandlerContext handlerContext = new MessageHandlerContext();
+    private MessageHandlerContext handlerContext = new MessageHandlerContext();
 
 
     /**
@@ -59,6 +59,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      *
      * @param appId String：小程序或者服务号对应的appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
+     *
      * @return 如果微信token认证成功，那么返回微信请求中携带的echoStr字符串
      */
     @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.GET)
@@ -82,6 +83,7 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      *
      * @param appId String：小程序或者服务号对应的appId
      * @param request HttpServletRequest：HttpServletRequest请求对象
+     *
      * @return 直接返回 "success" 字符串
      */
     @RequestMapping (value = "message/callback/{appId}", method = RequestMethod.POST)
@@ -120,11 +122,28 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     }
 
 
+    @Override
+    public final void afterPropertiesSet() throws Exception
+    {
+        this.registerHandler(handlerContext);
+    }
+
+
+    /**
+     * 注册不同小程序的消息处理处理器
+     * 以及注册不同事件对应的的handlerAdapter
+     *
+     * @param handlerContext MessageHandlerContext：消息处理器上下文
+     */
+    protected abstract void registerHandler(MessageHandlerContext handlerContext);
+
+
     /**
      * 微信开发平台配置地址时，会检查连接是否可用，需要按要求原样返回请求内容
      *
      * @param appId String：小程序或者服务号的appId
      * @param request HttpServletRequest
+     *
      * @return 如果通过校验，则原样返回echoStr字符串，否则返回空字符串
      */
     private String checkConnection(String appId, HttpServletRequest request)

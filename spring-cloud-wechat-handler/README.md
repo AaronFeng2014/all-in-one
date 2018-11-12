@@ -54,7 +54,7 @@
       
 3. Controller实现
       
-       接入的应用需要有一个controller实现AbstractMessageCallBackController（该controller会自动暴露endpoints） 并实现一个需要唯一实现的方法 afterPropertiesSet
+       接入的应用需要有一个controller实现AbstractMessageCallBackController（该controller会自动暴露endpoints） 并实现一个需要唯一实现的方法 registerHandler
 
 4. 关心的回调事件与对应的处理器注册
         
