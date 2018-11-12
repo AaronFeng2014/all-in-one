@@ -11,9 +11,13 @@
        在二维码生成和媒体资源上传时，默认使用了简单的内存缓存
        二维码缓存接口QrCodeCache，媒体资源缓存接口MideaCache，
        如果用户不使用内存缓存，可以通过带缓存参数的接口，传入自定义的缓存实现（如redis，mysql等）
+    **注意：** 微信消息发送和资源上传功能封装在WxResourceUtil类中
        
        
 2. 小程序消息解密和token认证解密
+
+       小程序数据解密：MiniProgramEncryptedDataDecoder
+       微信token认证数据解密：WxSignatureUtil
 3. endpoint暴露方式
       
        AbstractMessageCallBackController抽象类中自动暴露了2个endpoints
