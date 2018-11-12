@@ -22,7 +22,7 @@ import java.util.function.Function;
  */
 public class WxResourceFetchUtilTest
 {
-    String localToken = "15_RsXdQBfwWxYPBCe84ONfH1v7-mlpK-O-Vj8fXXLhKT1xGmx7KRxdEDTJWvHCsAMWd7JeOjJMd9kRq4hQRTmpF1XJeQtsTJjlMCv7481YG0EjCBzTxnoRHy8hPMNET-_jbHQgzRTotCRFcAq0QJEiAIAXQL";
+    private String localToken = "15_RsXdQBfwWxYPBCe84ONfH1v7-mlpK-O-Vj8fXXLhKT1xGmx7KRxdEDTJWvHCsAMWd7JeOjJMd9kRq4hQRTmpF1XJeQtsTJjlMCv7481YG0EjCBzTxnoRHy8hPMNET-_jbHQgzRTotCRFcAq0QJEiAIAXQL";
 
 
     @Test

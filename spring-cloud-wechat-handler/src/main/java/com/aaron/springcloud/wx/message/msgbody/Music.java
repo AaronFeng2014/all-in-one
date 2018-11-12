@@ -25,7 +25,7 @@ public class Music
     private String musicUrl;
 
     @JSONField (name = "hqmusicurl")
-    private String hqmusicurl;
+    private String hqMusicUrl;
 
     private String description;
 }

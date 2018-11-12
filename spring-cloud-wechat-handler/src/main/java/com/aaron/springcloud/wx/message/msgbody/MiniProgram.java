@@ -1,5 +1,6 @@
 package com.aaron.springcloud.wx.message.msgbody;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,8 +16,10 @@ import lombok.ToString;
 public class MiniProgram
 {
 
-    private String appid;
+    @JSONField (name = "appid")
+    private String appId;
 
-    private String pagepath;
+    @JSONField (name = "pagepath")
+    private String pagePath;
 
 }

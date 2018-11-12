@@ -1,5 +1,6 @@
 package com.aaron.springcloud.wx.message.msgbody;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,5 +17,6 @@ public class MiniProgramCard extends MiniProgram
 {
     private String title;
 
-    private String thumb_media_id;
+    @JSONField (name = "thumb_media_id")
+    private String thumbMediaId;
 }
