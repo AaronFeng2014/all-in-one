@@ -131,6 +131,28 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      * 注册不同小程序的消息处理处理器
      * 以及注册不同事件对应的的handlerAdapter
      *
+     * <p>
+     * 注册示例：
+     * <code>
+     * <p>
+     * MessageHandlerAdapterContext app1 = new MessageHandlerAdapterContext("app1");
+     * //具体事件对应的handlerAdapter，同一事件可注册多个
+     * app1.addMessageHandlerAdapter(WxCallBackTypeEnum.SUBSCRIBE_EVENT, new AbstractMessageHandlerAdapter()
+     * {
+     * //实现方法
+     * });
+     * <p>
+     * MessageHandlerAdapterContext app2= new MessageHandlerAdapterContext("app2");
+     * //具体事件对应的handlerAdapter，同一事件可注册多个
+     * app2.addMessageHandlerAdapter(WxCallBackTypeEnum.SUBSCRIBE_EVENT, new AbstractMessageHandlerAdapter()
+     * {
+     * //实现方法
+     * });
+     * <p>
+     * handlerContext.addMessageHandler(app1,app2);
+     *
+     * </code>
+     *
      * @param handlerContext MessageHandlerContext：消息处理器上下文
      */
     protected abstract void registerHandler(MessageHandlerContext handlerContext);

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import java.io.InputStream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 消息处理器链
@@ -75,13 +77,29 @@ public class MessageHandlerContext
     }
 
 
-    public MessageHandlerContext addMessageHandler(MessageHandlerAdapterContext messageHandler)
+    /**
+     * 注册messageHandlerAdapterContext
+     *
+     * @param messageHandlerAdapterContexts MessageHandlerAdapterContext：消息处理上下文，可变参数列表
+     *
+     * @return 返回MessageHandlerContext，为了支持脸是调用
+     */
+    public MessageHandlerContext addMessageHandler(MessageHandlerAdapterContext... messageHandlerAdapterContexts)
     {
-        Assert.notNull(messageHandler, "messageHandler不能为空");
+        Assert.notNull(messageHandlerAdapterContexts, "messageHandler不能为空");
 
-        messageHandlerList.add(messageHandler);
+        if (ArrayUtils.isEmpty(messageHandlerAdapterContexts))
+        {
+            throw new IllegalArgumentException("messageHandler不能为空");
+        }
 
-        LOGGER.info("已注册公众号或小程序事件处理器，appId：{}", messageHandler.getAppId());
+        Stream.of(messageHandlerAdapterContexts).forEach(messageHandlerAdapterContext -> {
+
+            messageHandlerList.add(messageHandlerAdapterContext);
+
+            LOGGER.info("已注册公众号或小程序事件处理器，appId：{}", messageHandlerAdapterContext.getAppId());
+
+        });
 
         return this;
     }

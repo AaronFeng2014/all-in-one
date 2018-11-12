@@ -92,6 +92,9 @@ public class MessageHandlerAdapterContext
 
                 try
                 {
+                    //设置appId进去
+                    consumer.setAppId(this.appId);
+
                     consumer.accept(params);
                 }
                 catch (Exception e)

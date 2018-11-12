@@ -1,5 +1,7 @@
 package com.aaron.springcloud.wx.handler;
 
+import lombok.Setter;
+
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -14,6 +16,13 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractMessageHandlerAdapter implements Consumer<Map<String, String>>
 {
+
+    /**
+     * 小程序或者服务号对应的appId
+     */
+    @Setter
+    protected String appId;
+
 
     @Override
     public final void accept(Map<String, String> params)
