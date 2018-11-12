@@ -6,10 +6,12 @@ import com.aaron.springcloud.wx.domain.QrCode;
 import com.aaron.springcloud.wx.menu.MenuButton;
 import com.aaron.springcloud.wx.message.TemplateMessage;
 import com.aaron.springcloud.wx.message.TextMessage;
+import com.aaron.springcloud.wx.message.msgbody.TemplateItem;
 import com.aaron.springcloud.wx.message.msgbody.Text;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -20,6 +22,8 @@ import java.util.function.Function;
  */
 public class WxResourceFetchUtilTest
 {
+    String localToken = "15_RsXdQBfwWxYPBCe84ONfH1v7-mlpK-O-Vj8fXXLhKT1xGmx7KRxdEDTJWvHCsAMWd7JeOjJMd9kRq4hQRTmpF1XJeQtsTJjlMCv7481YG0EjCBzTxnoRHy8hPMNET-_jbHQgzRTotCRFcAq0QJEiAIAXQL";
+
 
     @Test
     public void getAccessToken()
@@ -43,10 +47,8 @@ public class WxResourceFetchUtilTest
     public void sendCustomerMessage()
     {
 
-        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
-
         TextMessage message = new TextMessage(new Text("test"), localToken);
-        message.setTouser("oQJo34yjSF3vL-zrbNPbFUlPJzSw");
+        message.setTouser("oDA9esyHfeUQTPBYvxTykFlccHu0");
         WxResourceUtil.sendCustomerMessage(message);
     }
 
@@ -57,7 +59,6 @@ public class WxResourceFetchUtilTest
         String wxGroupUrl = "http://fdfs.test.ximalaya.com/group1/M00/4D/39/wKgDplvOxoWAL562AACUsZTVKXE621.jpg";
         MediaResourceRequest resource = new MediaResourceRequest(MediaResourceTypeEnum.IMAGE, wxGroupUrl, "");
 
-        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
         Function<String, String> tokenFun = p -> localToken;
 
         for (int i = 0; i < 20; i++)
@@ -109,7 +110,6 @@ public class WxResourceFetchUtilTest
     {
         QrCode qrCode = new QrCode("test-appId-unless", "test-scene");
 
-        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
         Function<String, String> tokenFun = p -> localToken;
 
         for (int i = 0; i < 20; i++)
@@ -144,7 +144,6 @@ public class WxResourceFetchUtilTest
     @Test
     public void createMenu()
     {
-        String localToken = "";
         MenuButton menuButton = new MenuButton(localToken);
 
         //一级菜单
@@ -176,10 +175,13 @@ public class WxResourceFetchUtilTest
     @Test
     public void sendTemplateMessage()
     {
-        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
 
-        String openId = "oQJo34yjSF3vL-zrbNPbFUlPJzSw";
-        TemplateMessage message = new TemplateMessage(openId, "", null);
+        String openId = "oDA9esyHfeUQTPBYvxTykFlccHu0";
+        String templateId = "EUzT-E35mu_HpgWVlD5VLAvZZX-P7vfVBzwJgx_myJA";
+        TreeMap<String, TemplateItem> data = new TreeMap<>();
+
+        data.put("first", new TemplateItem("nihoa", null));
+        TemplateMessage message = new TemplateMessage(openId, templateId, data);
         WxResourceUtil.sendTemplateMessage(message, localToken);
     }
 
