@@ -48,7 +48,7 @@ public interface MessageUrl
     /**
      * 普通客服消息发送地址
      */
-    String COSTUMER_MESSAGE_URL = "https://api.weixin.qq.com/cgi-bin/message/custom/send";
+    String COSTUMER_MESSAGE_URL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=";
 
     String UPLOADIMAGEURL = "https://api.weixin.qq.com/cgi-bin/media/uploadimg";
 

@@ -4,6 +4,9 @@ import com.aaron.springcloud.wx.constants.MediaResourceTypeEnum;
 import com.aaron.springcloud.wx.domain.MediaResourceRequest;
 import com.aaron.springcloud.wx.domain.QrCode;
 import com.aaron.springcloud.wx.menu.MenuButton;
+import com.aaron.springcloud.wx.message.TemplateMessage;
+import com.aaron.springcloud.wx.message.TextMessage;
+import com.aaron.springcloud.wx.message.msgbody.Text;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
@@ -39,6 +42,12 @@ public class WxResourceFetchUtilTest
     @Test
     public void sendCustomerMessage()
     {
+
+        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
+
+        TextMessage message = new TextMessage(new Text("test"), localToken);
+        message.setTouser("oQJo34yjSF3vL-zrbNPbFUlPJzSw");
+        WxResourceUtil.sendCustomerMessage(message);
     }
 
 
@@ -162,4 +171,16 @@ public class WxResourceFetchUtilTest
 
         System.out.println("菜单创建结果" + WxResourceUtil.createMenu(menuButton));
     }
+
+
+    @Test
+    public void sendTemplateMessage()
+    {
+        String localToken = "15_j8menNhcLyQimo9rYWPQgfUvK0ypHqtfvZbNef48YoLNH5CACJmC5GmoWHRp_DsOJIzIAib9bTJ9DUyqx5Kxww5eZN_h0vQJkOCvTpkN7e8tIp9dYYBviHGk21g0fMkSKSMH5pjVDIJD2nWBVNMiAAAGYX";
+
+        String openId = "oQJo34yjSF3vL-zrbNPbFUlPJzSw";
+        TemplateMessage message = new TemplateMessage(openId, "", null);
+        WxResourceUtil.sendTemplateMessage(message, localToken);
+    }
+
 }

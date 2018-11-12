@@ -193,7 +193,7 @@ public final class WxResourceUtil extends BaseUtil
         try
         {
 
-            HttpEntity<CostumerMessage> requestEntity = new HttpEntity<>(costumerMessage);
+            HttpEntity<CostumerMessage> requestEntity = new HttpEntity<>(costumerMessage, DEFAULT_HEADER);
             JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(costumerMessage.getUrl(), requestEntity, String.class));
 
             return isSuccess(jsonObject);
