@@ -155,7 +155,7 @@ public final class WxResourceUtil extends BaseUtil
 
 
     /**
-     * 模板消息发送接口
+     * 服务号模板消息发送接口
      *
      * @param message TemplateMessage：要发送的模板消息内容
      * @param accessToken String：接口调用凭证accessToken
@@ -178,6 +178,18 @@ public final class WxResourceUtil extends BaseUtil
             LOGGER.error("发送模板消息异常", e);
             return false;
         }
+    }
+
+
+    /**
+     * 小程序发送模板消息，消息是展示在微信你的服务通知中的
+     *
+     * @return 发送成功时返回true，否则返回false
+     */
+    public static boolean sendTemplateMessage()
+    {
+        return false;
+
     }
 
 
@@ -254,19 +266,18 @@ public final class WxResourceUtil extends BaseUtil
                                                       CacheItem<MediaCacheItem> mediaCacheRepository)
     {
         //尝试优先从缓存中获取
-        String key = mediaResource.getResourceUrl();
-
-        String mediaId = mediaCacheRepository.get(key);
+        String cacheKey = mediaResource.getAppId() + mediaResource.getResourceUrl();
+        String mediaId = mediaCacheRepository.get(cacheKey);
 
         if (!StringUtils.isEmpty(mediaId))
         {
             return mediaId;
         }
 
-        synchronized (key.intern())
+        synchronized (cacheKey.intern())
         {
 
-            mediaId = mediaCacheRepository.get(key);
+            mediaId = mediaCacheRepository.get(cacheKey);
 
             if (!StringUtils.isEmpty(mediaId))
             {
@@ -280,7 +291,7 @@ public final class WxResourceUtil extends BaseUtil
                 mediaId = doUploadTemporaryMediaResource(mediaResource, accessToken);
 
                 //写入到缓存中
-                mediaCacheRepository.save(key, new MediaCacheItem(mediaId));
+                mediaCacheRepository.save(cacheKey, new MediaCacheItem(mediaId));
 
                 return mediaId;
 
@@ -461,16 +472,19 @@ public final class WxResourceUtil extends BaseUtil
 
         String sceneStr = qrCodeRequest.getActionInfo().getScene().getSceneStr();
 
-        String qrCodeUrl = cacheRepository.get(sceneStr);
+        String cacheKey = qrCodeRequest.getAppId() + sceneStr;
+
+        String qrCodeUrl = cacheRepository.get(cacheKey);
 
         if (StringUtils.isNotEmpty(qrCodeUrl))
         {
             return qrCodeUrl;
         }
 
-        synchronized (sceneStr.intern())
+        synchronized (cacheKey.intern())
         {
-            qrCodeUrl = cacheRepository.get(sceneStr);
+            qrCodeUrl = cacheRepository.get(cacheKey);
+
             if (StringUtils.isNotEmpty(qrCodeUrl))
             {
                 return qrCodeUrl;
@@ -595,7 +609,9 @@ public final class WxResourceUtil extends BaseUtil
 
         String sceneStr = qrCodeRequest.getActionInfo().getScene().getSceneStr();
 
-        qrCodeCacheRepository.save(sceneStr, cacheItem);
+        String cacheKey = qrCodeRequest.getAppId() + sceneStr;
+
+        qrCodeCacheRepository.save(cacheKey, cacheItem);
 
         return qrCodeUrl;
     }
