@@ -2,7 +2,6 @@ package com.aaron.springcloud.wx.domain;
 
 import com.aaron.springcloud.wx.constants.MediaResourceTypeEnum;
 import com.alibaba.fastjson.annotation.JSONField;
-import java.net.URL;
 import lombok.Getter;
 
 /**
@@ -26,10 +25,13 @@ public class MediaResourceRequest
     @JSONField (serialize = false)
     private String appId;
 
-    private URL resourceUrl;
+    /**
+     * 资源的网络地址
+     */
+    private String resourceUrl;
 
 
-    public MediaResourceRequest(MediaResourceTypeEnum typeEnum, URL resourceUrl, String appId)
+    public MediaResourceRequest(MediaResourceTypeEnum typeEnum, String resourceUrl, String appId)
     {
         this.type = typeEnum.getType();
         this.resourceUrl = resourceUrl;

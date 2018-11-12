@@ -254,7 +254,7 @@ public final class WxResourceFetchUtil extends BaseUtil
                                                       CacheItem<MediaCacheItem> mediaCacheRepository)
     {
         //尝试优先从缓存中获取
-        String key = mediaResource.getResourceUrl().getPath();
+        String key = mediaResource.getResourceUrl();
 
         String mediaId = mediaCacheRepository.get(key);
 
@@ -536,7 +536,7 @@ public final class WxResourceFetchUtil extends BaseUtil
 
     private static String doUploadTemporaryMediaResource(MediaResourceRequest mediaResource, String accessToken) throws IOException
     {
-        String path = mediaResource.getResourceUrl().getPath();
+        String path = mediaResource.getResourceUrl();
 
         byte[] byteArray = IOUtils.toByteArray(new URL(path));
         ContentBody contentBody = new ByteArrayBody(byteArray, FilenameUtils.getName(path));
