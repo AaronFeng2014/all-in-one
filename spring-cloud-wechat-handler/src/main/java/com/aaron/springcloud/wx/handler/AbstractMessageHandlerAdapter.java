@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * @description 一句话描述该文件的用途
  * @date 2018-11-09
  */
-public abstract class MessageHandlerAdapter implements Consumer<Map<String, String>>
+public abstract class AbstractMessageHandlerAdapter implements Consumer<Map<String, String>>
 {
 
     @Override

@@ -24,8 +24,8 @@ public class MiniProgramQrCodeParam
     private Integer width;
 
     @JSONField (name = "auto_color")
-    private String auto_color;
+    private String autoColor;
 
     @JSONField (name = "is_hyaline")
-    private boolean is_hyaline = true;
+    private boolean isHyaline = true;
 }

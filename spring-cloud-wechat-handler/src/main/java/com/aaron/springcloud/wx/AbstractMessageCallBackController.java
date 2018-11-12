@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * 在接收到请求时，会解析出消息的appId信息，去和handlerContext中的MessageHandlerAdapterContext列表中的每一个MessageHandlerAdapterContext做匹配，
  * 匹配上了，就会被MessageHandlerAdapterContext处理
  * <p>
- * 如果所有的MessageHandlerAdapterContext列表中都没有被匹配到一个合适的MessageHandlerAdapterContext，会发出一个警告信息，提醒开发者注意
+ * 如果所有的MessageHandlerAdapterContext列表中都没有被匹配到一个合适的AbstractMessageHandlerAdapter，会发出一个警告信息，提醒开发者注意
  * <p>
  * 如果匹配到了MessageHandlerAdapterContext，但是没有匹配到具体的事件处理adapter，也会发出相应的警告
  *

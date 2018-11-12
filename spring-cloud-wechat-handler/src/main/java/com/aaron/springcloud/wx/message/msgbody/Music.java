@@ -19,7 +19,7 @@ public class Music
     private String title;
 
     @JSONField (name = "thumb_media_id")
-    private String thumb_media_id;
+    private String thumbMediaId;
 
     @JSONField (name = "musicurl")
     private String musicUrl;

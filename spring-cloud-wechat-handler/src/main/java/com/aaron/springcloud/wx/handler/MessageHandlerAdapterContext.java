@@ -29,7 +29,7 @@ public class MessageHandlerAdapterContext
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4);
 
-    private static final MessageHandlerAdapter DEFAULT_HANDLER_ADAPTER = new MessageHandlerAdapter()
+    private static final AbstractMessageHandlerAdapter DEFAULT_HANDLER_ADAPTER = new AbstractMessageHandlerAdapter()
     {
         @Override
         protected void messageHandle(Map<String, String> params)
@@ -41,12 +41,12 @@ public class MessageHandlerAdapterContext
         }
     };
 
-    private static final List<MessageHandlerAdapter> SINGLE_DEFAULT_HANDLER_ADAPTER = ImmutableList.of(DEFAULT_HANDLER_ADAPTER);
+    private static final List<AbstractMessageHandlerAdapter> SINGLE_DEFAULT_HANDLER_ADAPTER = ImmutableList.of(DEFAULT_HANDLER_ADAPTER);
 
     /**
      * 消息处理适配器
      */
-    private Map<String, List<MessageHandlerAdapter>> messageHandlerAdapters = new HashMap<>();
+    private Map<String, List<AbstractMessageHandlerAdapter>> messageHandlerAdapters = new HashMap<>();
 
     @Getter
     private String appId;
@@ -109,25 +109,25 @@ public class MessageHandlerAdapterContext
      * 注册事件处理器，在接收到微信的回调后，只会关心已经注册过的事件，同一个事件可以注册多个处理器
      *
      * @param callBack MessageAdapterTypeEnum： 参考{@link com.aaron.springcloud.wx.register.WxCallBackTypeEnum}中定义的枚举值，该参数表示用户关心的微信回调事件
-     * @param consumers Consumer<Map<String, Object>>：对应事件的处理器
+     * @param adapters AbstractMessageHandlerAdapter：对应事件的处理器
      */
-    public MessageHandlerAdapterContext addMessageHandlerAdapter(WxCallBackTypeEnum callBack, MessageHandlerAdapter... consumers)
+    public MessageHandlerAdapterContext addMessageHandlerAdapter(WxCallBackTypeEnum callBack, AbstractMessageHandlerAdapter... adapters)
     {
-        Assert.notNull(consumers, "consumer参数不能为空");
+        Assert.notNull(adapters, "consumer参数不能为空");
 
-        List<MessageHandlerAdapter> consumerList = messageHandlerAdapters.get(callBack.getType());
+        List<AbstractMessageHandlerAdapter> consumerList = messageHandlerAdapters.get(callBack.getType());
 
         if (consumerList == null)
         {
-            List<MessageHandlerAdapter> newList = new ArrayList<>();
+            List<AbstractMessageHandlerAdapter> newList = new ArrayList<>();
 
-            Collections.addAll(newList, consumers);
+            Collections.addAll(newList, adapters);
 
             messageHandlerAdapters.put(callBack.getType(), newList);
         }
         else
         {
-            Collections.addAll(consumerList, consumers);
+            Collections.addAll(consumerList, adapters);
         }
 
         LOGGER.info("已注册公众号或者小程序回调事件，appId：{},事件类型：{}", this.appId, callBack.getType());
