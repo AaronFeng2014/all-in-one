@@ -96,30 +96,6 @@ public abstract class AbstractMessageCallBackController implements InitializingB
     }
 
 
-    /**
-     * 匹配到具体handlerAdapter后，内部使用异步处理，核心逻辑处理
-     *
-     * @param appId String：消息所属的appId
-     * @param request HttpServletRequest：HttpServletRequest请求对象
-     */
-    final void asyncDoHandle(String appId, HttpServletRequest request)
-    {
-        String originalParams;
-        try
-        {
-            originalParams = IOUtils.toString(request.getInputStream(), Charset.defaultCharset());
-        }
-        catch (IOException e)
-        {
-            LOGGER.error("参数解析异常", e);
-
-            return;
-        }
-
-        handlerContext.handleMessageChain(appId, originalParams);
-    }
-
-
     @Override
     public final void afterPropertiesSet() throws Exception
     {
@@ -156,6 +132,30 @@ public abstract class AbstractMessageCallBackController implements InitializingB
      * @param handlerContext MessageHandlerContext：消息处理器上下文
      */
     protected abstract void registerHandler(MessageHandlerContext handlerContext);
+
+
+    /**
+     * 匹配到具体handlerAdapter后，内部使用异步处理，核心逻辑处理
+     *
+     * @param appId String：消息所属的appId
+     * @param request HttpServletRequest：HttpServletRequest请求对象
+     */
+    private void asyncDoHandle(String appId, HttpServletRequest request)
+    {
+        String originalParams;
+        try
+        {
+            originalParams = IOUtils.toString(request.getInputStream(), Charset.defaultCharset());
+        }
+        catch (IOException e)
+        {
+            LOGGER.error("参数解析异常", e);
+
+            return;
+        }
+
+        handlerContext.handleMessageChain(appId, originalParams);
+    }
 
 
     /**
