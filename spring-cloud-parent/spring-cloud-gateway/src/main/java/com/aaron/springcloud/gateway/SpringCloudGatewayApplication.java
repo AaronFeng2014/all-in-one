@@ -54,7 +54,15 @@ public class SpringCloudGatewayApplication
         config.setKeyResolver(new MyKeyResolver());
     };
 
-    private Function<GatewayFilterSpec, UriSpec> consumerFilter = gatewayFilterSpec -> gatewayFilterSpec.addResponseHeader("hello", "world")
+    /**
+     * GatewayFilterSpec.stripPrefix 可以移除网关地址中的部分前缀
+     * <p>
+     * 网关路由默认是和背后真实服务器地址一样
+     * <p>
+     * 这里使用了stripPrefix(1)，所以在  test/consumer/** 的地址路由的时候回移除 test
+     */
+    private Function<GatewayFilterSpec, UriSpec> consumerFilter = gatewayFilterSpec -> gatewayFilterSpec.stripPrefix(1)
+                                                                                                        .addResponseHeader("hello", "world")
                                                                                                         .requestRateLimiter(
                                                                                                                 rateLimiterFilter);
 
@@ -62,7 +70,7 @@ public class SpringCloudGatewayApplication
      * 下面配置的意思：
      * 把/consumer/**开始的请求都转发到7777端口下，即是ng中的反向代理
      */
-    private Function<PredicateSpec, Route.AsyncBuilder> consumerRoute = predicateSpec -> predicateSpec.path("/consumer/**")
+    private Function<PredicateSpec, Route.AsyncBuilder> consumerRoute = predicateSpec -> predicateSpec.path("/test/consumer/**")
                                                                                                       .filters(consumerFilter)
                                                                                                       .uri("http://7777.local.com:7777");
 
