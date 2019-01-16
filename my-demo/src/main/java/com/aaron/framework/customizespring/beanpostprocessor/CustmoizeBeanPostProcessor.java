@@ -29,7 +29,7 @@ public class CustmoizeBeanPostProcessor implements BeanPostProcessor
 
         if (bean instanceof Function)
         {
-            ((Function<String, Integer>)bean).apply("23");
+            System.out.println("----------------" + ((Function<String, Integer>)bean).apply("23"));
         }
 
         return bean;
