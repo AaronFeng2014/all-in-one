@@ -37,6 +37,6 @@ public class MyBeanRegistryPostProcessor implements BeanDefinitionRegistryPostPr
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
-
+        System.err.println("test-----");
     }
 }
