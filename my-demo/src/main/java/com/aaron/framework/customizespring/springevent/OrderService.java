@@ -5,6 +5,8 @@ import com.aaron.framework.customizespring.springevent.event.OrderCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author FengHaixin
@@ -22,6 +24,13 @@ public class OrderService implements ApplicationEventPublisher
     public void createOrder()
     {
         this.publishEvent(new OrderCreatedEvent("createOrder"));
+    }
+
+
+    @Transactional (propagation = Propagation.REQUIRED)
+    public void createOrderWithTransactional()
+    {
+        this.publishEvent(new OrderCreatedEvent("createOrderWithTransactional"));
     }
 
 

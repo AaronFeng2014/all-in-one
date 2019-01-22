@@ -27,6 +27,7 @@ public class SpringEventTest
         OrderService orderService = context.getBean(OrderService.class);
 
         orderService.createOrder();
+        orderService.createOrderWithTransactional();
         orderService.cancelOrder();
     }
 }
