@@ -27,6 +27,8 @@ public class AnnotationBasedListener
      * 具有事物属性的监听器
      * <p>
      * 注意： 该监听器只能监听到在事物方法中发布的事件，非事物方法中发布的事件不会被该监听器接收
+     *
+     * 如果想让该事物监听器在非事物方法中执行， 需要加上 fallbackExecution = true
      */
     @TransactionalEventListener (phase = TransactionPhase.AFTER_COMMIT)
     public void createOrder(OrderCreatedEvent orderCreatedEvent)
