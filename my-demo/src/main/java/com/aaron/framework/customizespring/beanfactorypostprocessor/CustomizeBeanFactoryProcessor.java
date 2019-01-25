@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Import ({ImportBean.class, CustomizeImportBeanDefinitionRegistrar.class})
-public class CustomizeBeanFactoryProcessor implements BeanFactoryPostProcessor
+public class CustomizeBeanFactoryProcessor implements BeanFactoryPostProcessor, ApplicationContextAware
 {
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
@@ -34,5 +36,12 @@ public class CustomizeBeanFactoryProcessor implements BeanFactoryPostProcessor
         System.out.println(parse.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
 
         System.out.println("");
+    }
+
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        System.out.println("applicationContext --> " + applicationContext);
     }
 }

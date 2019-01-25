@@ -15,6 +15,7 @@ import java.util.function.Function;
 @Component
 public class CustmoizeBeanPostProcessor implements BeanPostProcessor
 {
+
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
