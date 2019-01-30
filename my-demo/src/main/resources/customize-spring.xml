@@ -17,6 +17,6 @@
     <xmly:backup-path file-system="本地硬盘" network="网络"/>
 
 
-    <tx:annotation-driven/>
+    <!--<tx:annotation-driven/>-->
 
 </beans>

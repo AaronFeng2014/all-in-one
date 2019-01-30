@@ -3,8 +3,11 @@ package com.aaron.component.rxjava;
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 观察者回调
@@ -21,7 +24,7 @@ public class ObserverCallBackSample
      * Action 接口作为onCompleted回调
      * Consumer 接口最为onNext或者onError的回调
      */
-    private Action completed = () -> log.info("执行完成");
+    private Action completed = () -> { TimeUnit.SECONDS.sleep(1);log.info("执行完成");};
 
     private Consumer<String> onNext = content -> log.info("接收到数据：{}", content);
 
@@ -29,10 +32,12 @@ public class ObserverCallBackSample
 
 
     @Test
-    public void test01()
+    public void test01() throws InterruptedException
     {
 
-        Observable.just("1", "2", "3").doOnComplete(() -> log.info("这是完成前的回调")).subscribe(onNext, onError, completed);
+        Observable.just("1", "2", "3").doOnComplete(() -> log.info("这是完成前的回调")).subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(onNext, onError, completed);
+
+        TimeUnit.SECONDS.sleep(2);
     }
 
 }

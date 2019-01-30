@@ -27,7 +27,7 @@ public class OrderService implements ApplicationEventPublisher
     }
 
 
-    @Transactional (propagation = Propagation.REQUIRED)
+    //@Transactional (propagation = Propagation.REQUIRED)
     public void createOrderWithTransactional()
     {
         this.publishEvent(new OrderCreatedEvent("createOrderWithTransactional"));

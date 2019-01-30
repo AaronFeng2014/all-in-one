@@ -1,5 +1,6 @@
 package com.aaron.framework.customizespring.registry;
 
+import com.aaron.framework.customizespring.aware.ListenerAware;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @date 2018/5/30
  */
 @Component
-public class MyBeanRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor
+public class MyBeanRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, ListenerAware
 {
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException
@@ -38,5 +39,12 @@ public class MyBeanRegistryPostProcessor implements BeanDefinitionRegistryPostPr
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
         System.err.println("test-----");
+    }
+
+
+    @Override
+    public void setListener()
+    {
+        System.err.println("setListener-----");
     }
 }
