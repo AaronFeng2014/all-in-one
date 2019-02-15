@@ -2,7 +2,9 @@ package com.aaron.framework.customizespring.registry;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 
 /**
  * 该bean通过RegistryPostProcessor手动注册到spring context中
@@ -19,6 +21,9 @@ public class BeanRegistryBean
     private String name;
 
     private String school;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
 
     public void init()

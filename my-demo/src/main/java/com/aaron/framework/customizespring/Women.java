@@ -1,5 +1,6 @@
 package com.aaron.framework.customizespring;
 
+import com.aaron.framework.customizespring.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,5 +13,11 @@ import org.springframework.stereotype.Component;
 public class Women
 {
     @Autowired
-    private Student student;
+    private StudentService student;
+
+
+    public void introduce()
+    {
+        System.out.println("women");
+    }
 }

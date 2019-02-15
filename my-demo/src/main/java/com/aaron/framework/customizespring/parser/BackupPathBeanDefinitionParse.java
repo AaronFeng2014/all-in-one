@@ -1,4 +1,4 @@
-package com.aaron.framework.customizespring;
+package com.aaron.framework.customizespring.parser;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;

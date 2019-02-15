@@ -1,1 +1,1 @@
-http\://www.springframework.org/schema/xmly=com.aaron.framework.customizespring.XmlyNamespaceHandler
+http\://www.springframework.org/schema/xmly=com.aaron.framework.customizespring.namespacehandler.XmlyNamespaceHandler

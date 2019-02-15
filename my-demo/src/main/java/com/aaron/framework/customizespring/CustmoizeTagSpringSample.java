@@ -1,11 +1,10 @@
 package com.aaron.framework.customizespring;
 
 import com.aaron.framework.customizespring.context.MyApplicationContext;
-import com.aaron.framework.customizespring.registry.BeanRegistryBean;
+import com.aaron.framework.customizespring.service.StudentService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author FengHaixin
@@ -21,10 +20,10 @@ public class CustmoizeTagSpringSample
     {
         ApplicationContext context = new MyApplicationContext("customize-spring.xml");
 
-        System.out.println("bean ---->" + context.getBean(ImportBean.class));
-        BeanRegistryBean bean = context.getBean(BeanRegistryBean.class);
+        StudentService bean = context.getBean(StudentService.class);
+        bean.introduce("feng");
 
-        System.out.println(bean);
-        System.out.println(context);
+        Women women = context.getBean(Women.class);
+        women.introduce();
     }
 }
