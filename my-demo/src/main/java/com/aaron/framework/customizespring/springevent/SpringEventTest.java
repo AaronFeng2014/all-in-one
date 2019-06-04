@@ -1,7 +1,7 @@
 package com.aaron.framework.customizespring.springevent;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @author FengHaixin
@@ -22,7 +22,7 @@ public class SpringEventTest
      */
     public static void main(String[] args)
     {
-        ApplicationContext context = new ClassPathXmlApplicationContext("customize-spring.xml");
+        ApplicationContext context = new AnnotationConfigApplicationContext("com.aaron.framework.customizespring.springevent");
 
         OrderService orderService = context.getBean(OrderService.class);
 
