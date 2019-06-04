@@ -1,4 +1,4 @@
-package com.aaron.framework.customizespring.service;
+package com.aaron.framework.customizespring.beanpostprocessor;
 
 import com.aaron.framework.customizespring.aware.ListenerAware;
 import org.slf4j.Logger;
@@ -23,19 +23,13 @@ public class StudentService implements ApplicationContextAware, ListenerAware
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
-        System.out.println("哈哈哈哈");
+        LOGGER.warn("哈哈哈哈");
     }
 
 
     @Override
     public void setListener()
     {
-        System.err.println("setListener-----");
-    }
-
-
-    public void introduce(String name)
-    {
-        LOGGER.warn("hello, i am {}", name);
+        LOGGER.error("setListener-----");
     }
 }

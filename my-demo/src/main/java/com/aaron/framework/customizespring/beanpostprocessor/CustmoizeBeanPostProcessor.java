@@ -1,5 +1,7 @@
 package com.aaron.framework.customizespring.beanpostprocessor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
@@ -15,22 +17,24 @@ import java.util.function.Function;
 @Component
 public class CustmoizeBeanPostProcessor implements BeanPostProcessor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustmoizeBeanPostProcessor.class);
+
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
-        System.out.println("=====bean初始化之前=====" + bean);
+        LOGGER.info("=====bean初始化之前=====" + bean);
 
         Controller annotation = bean.getClass().getAnnotation(Controller.class);
 
         if (annotation != null)
         {
-            System.out.println(bean + " 是一个控制器");
+            LOGGER.info(bean + " 是一个控制器");
         }
 
         if (bean instanceof Function)
         {
-            System.out.println("----------------" + ((Function<String, Integer>)bean).apply("23"));
+            LOGGER.info("----------------" + ((Function<String, Integer>)bean).apply("23"));
         }
 
         return bean;
@@ -40,7 +44,7 @@ public class CustmoizeBeanPostProcessor implements BeanPostProcessor
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
     {
-        System.out.println("=====bean初始化之后=====" + bean);
+        LOGGER.info("=====bean初始化之后=====" + bean);
         return bean;
     }
 }
