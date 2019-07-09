@@ -1,6 +1,10 @@
 package com.aaron.beginner.proxy.cglib;
 
+import java.lang.reflect.Method;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.CallbackFilter;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.NoOp;
 
 /**
  * @author FengHaixin
@@ -15,9 +19,15 @@ public class TestCglibProxy
 
         Enhancer enhancer = new Enhancer();
 
-        enhancer.setSuperclass(UserService.class);
+        enhancer.setSuperclass(UserServiceImpl.class);
 
-        enhancer.setCallback(cglibProxy);
+        /**
+         * NoOp.INSTANCE表示使用被代理类的实现类
+         * 因为使用代理类本身，会导致递归代理，栈溢出
+         */
+        enhancer.setCallbacks(new Callback[] {cglibProxy, NoOp.INSTANCE});
+
+        enhancer.setCallbackFilter(new MethodFilter());
 
         UserService userService = (UserService)enhancer.create();
 
@@ -26,5 +36,26 @@ public class TestCglibProxy
 
         System.out.println(name + " is " + age);
 
+    }
+
+
+    private static class MethodFilter implements CallbackFilter
+    {
+
+        /**
+         * 返回的是使用过滤器的索引
+         */
+        @Override
+        public int accept(Method method)
+        {
+            if ("getAge".equals(method.getName()))
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
     }
 }
